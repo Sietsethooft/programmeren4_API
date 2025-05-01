@@ -14,7 +14,12 @@ app.use(errorHandler);
 app.get('/', (req, res) => {
     res.json({
         status: 200,
-        message: 'Welcome to the API of Share-A-Meal!'
+        message: 'Welcome to the API of Share-A-Meal!',
+        data: {
+            name: 'Share-A-Meal API',
+            version: '1.0.0',
+            description: 'This is the API for Share-A-Meal, a platform for sharing meals.',
+        }
     });
 });
 
@@ -31,8 +36,6 @@ db.query('SELECT 1 + 1 AS result', (err, results) => {
 })
 
 const port = process.env.PORT || 3000;
-
-
 
 app.listen(port, () => {
     logger.info(`Server is running on port ${port}`);
