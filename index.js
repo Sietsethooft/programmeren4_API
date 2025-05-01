@@ -26,15 +26,6 @@ app.get('/', (req, res) => {
 // Route connection
 app.use('/api', userRoutes);
 
-// Test databaseConnection
-db.query('SELECT 1 + 1 AS result', (err, results) => {
-    if (err) {
-        console.error('Database connection failed:', err.message)
-    } else {
-        console.log('Database connected!')
-    }
-})
-
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
