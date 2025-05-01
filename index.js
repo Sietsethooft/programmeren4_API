@@ -1,10 +1,13 @@
 const express = require('express')
 const logger = require('./src/util/Logger');
 const db = require('./src/database/DBconfig')
+const errorHandler = require('./src/util/ErrorHandler');
 const dotenv = require('dotenv');
 require('dotenv').config()
 
 const app = express()
+const app = express();
+app.use(errorHandler);
 
 // Test databaseverbinding
 db.query('SELECT 1 + 1 AS result', (err, results) => {
