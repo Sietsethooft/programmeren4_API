@@ -3,7 +3,7 @@ const validate = require('../util/Validation');
 const logger = require('../util/Logger');
 
 const userController = {
-    registerUser: (req, res, next) => {
+    registerUser: (req, res, next) => { // UC-201
         const userData = req.body;
         
         const { error } = validate.registerUserValidation(userData); // Validate the user data using the validation function
@@ -25,10 +25,9 @@ const userController = {
 
             return res.status(400).json({
                 status: 400,
-                message: 'Validation error',
-                data: { 
-                    error: errorMessage // Send the validation error message back to the client
-                }});
+                message: 'Validation error: ' + errorMessage,
+                data: {}
+            });
         }
 
         userService.findUserByEmail(userData.emailAdress, (err, existingUser) => {
@@ -37,16 +36,12 @@ const userController = {
             if (existingUser) {
                 return res.status(403).json({
                     status: 403,
-                    message: 'User already exists',
-                    data: { 
-                        error: 'A user with this email address already exists.'
-                    }
+                    message: 'A user with this email address already exists.',
+                    data: {}
                 });
             }
         });
-
-
-        logger.info('Received user data:', userData); // Logs the received user data
+    },
     
         userService.registerUser(userData, (err, result) => {
             if (err) return next(err); // This sends the error to the error handler in util.
