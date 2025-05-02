@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json());
-app.use(errorHandler);
+
 
 app.get('/', (req, res) => {
     res.json({
@@ -23,8 +23,15 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/test-error', (req, res, next) => {
+    next({ status: 400, message: 'Test error' });
+});
+
+
 // Route connection
 app.use('/api', userRoutes);
+
+app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
 
