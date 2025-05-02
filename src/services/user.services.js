@@ -1,5 +1,6 @@
 const logger = require('../util/Logger');
 const db = require('../database/DBconfig');
+const { updateUser } = require('../controllers/user.controller');
 
 const userServices = {
     registerUser: (userData, callback) => {
@@ -11,7 +12,7 @@ const userServices = {
         `;
     
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber], (error, results) => {
-            if (err) return callback(err);            
+            if (error) return callback(error);            
     
             logger.info('User registered successfully:', results.insertId);
             return callback(null, { // Return the inserted user data with the generated ID
@@ -31,7 +32,7 @@ const userServices = {
         const query = `SELECT * FROM user WHERE emailAdress = ?`;
     
         db.query(query, [emailAdress], (error, results) => {
-            if (err) return callback(err);
+            if (error) return callback(error);
     
             if (results.length === 0) {
                 return callback(null, null); // No user found with the given email address
@@ -69,13 +70,37 @@ const userServices = {
             query += ' WHERE ' + conditions.join(' AND ');
         }
     
-        db.query(query, values, (err, results) => {
-            if (err) return callback(err);
+        db.query(query, values, (error, results) => {
+            if (error) return callback(error);
             
             logger.info('All users retrieved successfully:', results);
             return callback(null, results);
         });
     },
+
+    updateUser: (userId, userData, callback) => {
+        const { firstName, lastName, street, city, emailAdress, password, phonenumber } = userData; // Destructure userData
+    
+        const query = `
+            UPDATE user
+            SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, phonenumber = ?
+            WHERE id = ?
+        `;
+    
+        db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber, userId], (error, results) => {
+            if (error) return callback(error);
+    
+            logger.info('User updated successfully:', results);
+            return callback(null, { 
+                firstName,
+                lastName,
+                street,
+                city,
+                emailAdress,
+                phonenumber
+            });
+        });
+    }
 };
 
 module.exports = userServices;
