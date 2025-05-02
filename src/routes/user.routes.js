@@ -9,4 +9,6 @@ userRoutes.post('/user', userController.registerUser);
 
 userRoutes.put('/user/:userId', userController.updateUser);
 
+userRoutes.delete('/user/:userId', userController.deleteUser);
+
 module.exports = userRoutes;
