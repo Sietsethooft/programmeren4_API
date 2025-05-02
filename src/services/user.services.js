@@ -48,7 +48,22 @@ const userServices = {
             logger.info('User found:', results[0]);
             return callback(null, results[0]); // Return the found user
         });
-    }
+    },
+
+    getAllUsers: (callback) => {
+        const query = `
+            SELECT * FROM user
+        `;
+    
+        db.query(query, (error, results) => {
+            if (error) {
+                return callback(createDatabaseError(error)); // Use the createDatabaseError function to create a database error object
+            }
+    
+            logger.info('All users retrieved successfully:', results);
+            return callback(null, results); // Return all users
+        });
+    },
 };
 
 module.exports = userServices;
