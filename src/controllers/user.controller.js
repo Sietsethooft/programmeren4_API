@@ -40,6 +40,21 @@ const userController = {
                     data: {}
                 });
             }
+    
+            // If no existing user is found, proceed with registration
+            logger.info('Received user data:', userData); // Logs the received user data
+    
+            userService.registerUser(userData, (err, result) => {
+                if (err) return next(err); // This sends the error to the error handler in util.
+    
+                res.status(201).json({
+                    status: 201,
+                    message: 'User registered successfully',
+                    data: {
+                        result
+                    }
+                });
+            });
         });
     },
     
@@ -52,7 +67,7 @@ const userController = {
                 data: result
             });
         });
-    }   
+    },
 };
 
 module.exports = userController;
