@@ -35,8 +35,8 @@ const userController = {
             if (err) return next(err); // This sends the error to the error handler in util.
     
             if (existingUser) {
-                return res.status(409).json({
-                    status: 409,
+                return res.status(403).json({
+                    status: 403,
                     message: 'User already exists',
                     data: { 
                         error: 'A user with this email address already exists.'
