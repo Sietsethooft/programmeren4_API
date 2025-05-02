@@ -1,6 +1,5 @@
 const logger = require('../util/Logger');
 const db = require('../database/DBconfig');
-const { updateUser } = require('../controllers/user.controller');
 
 const userServices = {
     registerUser: (userData, callback) => {
