@@ -1,7 +1,5 @@
 const logger = require('../util/Logger');
 const db = require('../database/DBconfig');
-const { createDatabaseError } = require('../util/ErrorHandler'); // Importeer de hulpfunctie
-
 
 const userServices = {
     registerUser: (userData, callback) => {
@@ -13,9 +11,7 @@ const userServices = {
         `;
     
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber], (error, results) => {
-            if (error) {
-                return callback(createDatabaseError(error)); // Use the createDatabaseError function to create a database error object
-            }            
+            if (err) return callback(err);            
     
             logger.info('User registered successfully:', results.insertId);
             return callback(null, { // Return the inserted user data with the generated ID
@@ -32,14 +28,10 @@ const userServices = {
     },
 
     findUserByEmail: (emailAdress, callback) => {
-        const query = `
-            SELECT * FROM user WHERE emailAdress = ?
-        `;
+        const query = `SELECT * FROM user WHERE emailAdress = ?`;
     
         db.query(query, [emailAdress], (error, results) => {
-            if (error) {
-                return callback(createDatabaseError(error)); // Use the createDatabaseError function to create a database error object
-            }
+            if (err) return callback(err);
     
             if (results.length === 0) {
                 return callback(null, null); // No user found with the given email address
@@ -50,18 +42,38 @@ const userServices = {
         });
     },
 
-    getAllUsers: (callback) => {
-        const query = `
-            SELECT * FROM user
-        `;
+    getAllUsers: (filters = {}, callback) => { 
+        let query = 'SELECT id, firstName, lastName, emailAdress, phonenumber, isActive, street, city FROM user';
+        const values = []; 
     
-        db.query(query, (error, results) => {
-            if (error) {
-                return callback(createDatabaseError(error)); // Use the createDatabaseError function to create a database error object
-            }
+        const allowedFields = ['firstName', 'lastName', 'isActive', 'emailAdress', 'city']; // All allowed fields for filtering
+        const filterKeys = Object.keys(filters).filter(key => allowedFields.includes(key)); // Filter keys based on allowed fields
+        
+        if (filterKeys.length > 2) {
+            return callback(new Error('You can only filter on a maximum of 2 fields.'));
+        }
+        
+        if (filterKeys.length > 0) {
+            const conditions = filterKeys.map(key => {
+                let value = filters[key];
     
+                // Special handling for isActive to convert "true"/"false" to 1/0
+                if (key === 'isActive') {
+                    value = value === 'true' ? 1 : 0;
+                }
+    
+                values.push(value);
+                return `${key} = ?`;
+            });
+    
+            query += ' WHERE ' + conditions.join(' AND ');
+        }
+    
+        db.query(query, values, (err, results) => {
+            if (err) return callback(err);
+            
             logger.info('All users retrieved successfully:', results);
-            return callback(null, results); // Return all users
+            return callback(null, results);
         });
     },
 };

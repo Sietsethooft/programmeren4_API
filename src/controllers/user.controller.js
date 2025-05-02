@@ -59,7 +59,9 @@ const userController = {
     },
     
     getAllUsers: (req, res, next) => { // UC-202
-        userService.getAllUsers((err, users) => {
+        const filters = req.query;
+
+        userService.getAllUsers(filters, (err, users) => {
             if (err) return next(err); // This sends the error to the error handler in util.
     
             res.status(200).json({
