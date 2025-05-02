@@ -8,11 +8,27 @@ const userController = {
         
         const { error } = validate.registerUserValidation(userData); // Validate the user data using the validation function
         if (error) {
+            let errorMessage = '';
+            switch (error.details[0].context.key) { // Check the key of the error to provide a specific message
+                case 'emailAdress':
+                    errorMessage = 'EmailAdress is not in the correct format. An email address needs to follow the pattern: first.last@domain.com';
+                    break;
+                case 'password':
+                    errorMessage = 'Password must be at least 8 characters long and include at least one uppercase letter and one number.';
+                    break;
+                case 'phonenumber':
+                    errorMessage = 'Phonenumber must start with 06 and contain 10 digits.';
+                    break;
+                default:
+                    errorMessage = error.details[0].message; // Default error message when no specific case is matched
+            }
+
             return res.status(400).json({
                 status: 400,
                 message: 'Validation error',
-                error: error.details[0].message // Send the validation error message back to the client
-            });
+                data: { 
+                    error: errorMessage // Send the validation error message back to the client
+                }});
         }
 
 
