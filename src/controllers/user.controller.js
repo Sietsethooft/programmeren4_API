@@ -58,13 +58,16 @@ const userController = {
         });
     },
     
-        userService.registerUser(userData, (err, result) => {
+    getAllUsers: (req, res, next) => { // UC-202
+        userService.getAllUsers((err, users) => {
             if (err) return next(err); // This sends the error to the error handler in util.
     
-            res.status(201).json({
-                status: 201,
-                message: 'User registered successfully',
-                data: result
+            res.status(200).json({
+                status: 200,
+                message: 'Users retrieved successfully',
+                data: {
+                    users
+                }
             });
         });
     },
