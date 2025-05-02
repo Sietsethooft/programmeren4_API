@@ -12,14 +12,4 @@ function ErrorHandler(err, req, res, next) {
     });
 }
 
-// This function creates a database error object with a status code and message.
-function createDatabaseError(error) {
-    const dbError = new Error('Database error' + error.message);
-    dbError.status = 500;
-    return dbError;
-}
-
-module.exports = {
-    ErrorHandler,
-    createDatabaseError
-};
+module.exports = ErrorHandler;
