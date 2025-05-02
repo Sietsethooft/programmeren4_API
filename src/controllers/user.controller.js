@@ -42,19 +42,17 @@ const userController = {
         const filters = req.query;
 
         userService.getAllUsers(filters, (error, users) => {
-            if (error) return next(error); // This sends the error to the error handler in util.
+            if (error) return next(error);
     
             res.status(200).json({
                 status: 200,
                 message: 'Users retrieved successfully',
-                data: {
-                    users
-                }
+                data: {users}
             });
         });
     },
 
-    updateUser: (req, res, next) => { // UC-203
+    updateUser: (req, res, next) => { // UC-205
         const userId = req.params.userId;
         const userData = req.body;
 
@@ -64,7 +62,7 @@ const userController = {
         }
 
         userService.updateUser(userId, userData, (error, result) => {
-            if (error) return next(error); // This sends the error to the error handler in util.
+            if (error) return next(error);
 
             if (result.affectedRows === 0) {
                 return res.status(404).json({
@@ -77,10 +75,33 @@ const userController = {
             res.status(200).json({
                 status: 200,
                 message: 'User updated successfully',
-                data: result
+                data: result // No {} here, so the result is not wrapped in an object
+            });
+        });
+    },
+
+    deleteUser: (req, res, next) => { // UC-206
+        const userId = req.params.userId;
+
+        userService.deleteUser(userId, (error, result) => {
+            if (error) return next(error);
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found',
+                    data: {}
+                });
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: `User with ID ${userId} is deleted`,
+                data: {}
             });
         });
     }
+
 }
 
 module.exports = userController;
