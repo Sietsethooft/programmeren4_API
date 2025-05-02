@@ -1,0 +1,19 @@
+const joi = require('joi');
+
+const validation = {
+    registerUserValidation: (data) => {
+        const schema = joi.object({
+            firstName: joi.string().required(),
+            lastName: joi.string().required(),
+            street: joi.string().required(),
+            city: joi.string().required(),
+            emailAdress: joi.string().pattern(new RegExp('^[a-z]{1}\\.[a-z]{2,}@[a-z]{2,}\\.[a-z]{2,3}$')).required(),
+            password: joi.string().min(8).pattern(new RegExp('^(?=.*[A-Z])(?=.*\\d).*$')).required(),
+            phonenumber: joi.string().pattern(new RegExp('^06[\\s-]?\\d{8}$')).required()
+        });
+
+        return schema.validate(data);
+    }
+}
+
+module.exports = validation;
