@@ -2,7 +2,7 @@ const express = require('express')
 const logger = require('./src/util/Logger');
 const bodyParser = require('body-parser');
 const db = require('./src/database/DBconfig');
-const errorHandler = require('./src/util/ErrorHandler');
+const { ErrorHandler } = require('./src/util/ErrorHandler');
 const dotenv = require('dotenv');
 const userRoutes = require('./src/routes/user.routes');
 require('dotenv').config();
@@ -31,7 +31,7 @@ app.get('/test-error', (req, res, next) => {
 // Route connection
 app.use('/api', userRoutes);
 
-app.use(errorHandler);
+app.use(ErrorHandler);
 
 const port = process.env.PORT || 3000;
 

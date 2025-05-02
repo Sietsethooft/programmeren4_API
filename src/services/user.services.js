@@ -1,5 +1,7 @@
 const logger = require('../util/Logger');
 const db = require('../database/DBconfig');
+const { createDatabaseError } = require('../util/ErrorHandler'); // Importeer de hulpfunctie
+
 
 const userServices = {
     registerUser: (userData, callback) => {
@@ -12,13 +14,7 @@ const userServices = {
     
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber], (error, results) => {
             if (error) {
-                return callback({
-                    status: 500,
-                    message: 'Database error',
-                    data: {
-                        error: error.message
-                    }
-                });
+                return callback(createDatabaseError(error)); // Use the createDatabaseError function to create a database error object
             }            
     
             logger.info('User registered successfully:', results.insertId);
@@ -42,13 +38,7 @@ const userServices = {
     
         db.query(query, [emailAdress], (error, results) => {
             if (error) {
-                return callback({
-                    status: 500,
-                    message: 'Database error',
-                    data: {
-                        error: error.message
-                    }
-                });
+                return callback(createDatabaseError(error)); // Use the createDatabaseError function to create a database error object
             }
     
             if (results.length === 0) {
