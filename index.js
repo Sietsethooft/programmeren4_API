@@ -2,7 +2,7 @@ const express = require('express')
 const logger = require('./src/util/Logger');
 const bodyParser = require('body-parser');
 const db = require('./src/database/DBconfig');
-const errorHandler = require('./src/util/ErrorHandler');
+const { errorHandler } = require('./src/util/ErrorHandler');
 const dotenv = require('dotenv');
 const userRoutes = require('./src/routes/user.routes');
 require('dotenv').config();
