@@ -12,9 +12,11 @@ const userServices = {
     
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber], (error, results) => {
             if (error) {
-                logger.error('Error inserting user into database:', error.message);
-                return callback(error, null);
-            }
+                return callback({
+                    status: 500,
+                    message: 'Database error: ' + error.message
+                });
+            }            
     
             logger.info('User registered successfully:', results.insertId);
             return callback(null, {
