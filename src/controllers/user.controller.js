@@ -31,6 +31,20 @@ const userController = {
                 }});
         }
 
+        userService.findUserByEmail(userData.emailAdress, (err, existingUser) => {
+            if (err) return next(err); // This sends the error to the error handler in util.
+    
+            if (existingUser) {
+                return res.status(409).json({
+                    status: 409,
+                    message: 'User already exists',
+                    data: { 
+                        error: 'A user with this email address already exists.'
+                    }
+                });
+            }
+        });
+
 
         logger.info('Received user data:', userData); // Logs the received user data
     
