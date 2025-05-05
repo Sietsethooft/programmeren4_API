@@ -77,6 +77,17 @@ const userServices = {
         });
     },
 
+    getUserById: (userId, callback) => {
+        const query = `SELECT id, firstName, lastName, emailAdress, phonenumber, street, city FROM user WHERE id = ?`;
+    
+        db.query(query, [userId], (error, results) => {
+            if (error) return callback(error);
+    
+            logger.info('User found:', results[0]);
+            return callback(null, results[0]);
+        });
+    },
+
     updateUser: (userId, userData, callback) => {
         const { firstName, lastName, street, city, emailAdress, password, phonenumber } = userData; // Destructure userData
     
