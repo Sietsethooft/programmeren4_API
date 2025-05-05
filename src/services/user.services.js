@@ -89,15 +89,27 @@ const userServices = {
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber, userId], (error, results) => {
             if (error) return callback(error);
     
-            logger.info('User updated successfully:', results);
+            logger.info('User updated successfully:', { userId, ...userData });
             return callback(null, { 
                 firstName,
                 lastName,
                 street,
                 city,
                 emailAdress,
-                phonenumber
+                phonenumber,
+                password
             });
+        });
+    },
+
+    deleteUser: (userId, callback) => {
+        const query = `DELETE FROM user WHERE id = ?`;
+    
+        db.query(query, [userId], (error, result) => { // Gebruik result van de query
+            if (error) return callback(error);
+    
+            logger.info('User deleted successfully:', { userId, affectedRows: result.affectedRows });
+            return callback(null, result);
         });
     }
 };
