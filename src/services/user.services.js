@@ -78,8 +78,12 @@ const userServices = {
     },
 
     getUserById: (userId, callback) => {
-        const query = `SELECT id, firstName, lastName, emailAdress, phonenumber, street, city FROM user WHERE id = ?`;
-    
+        const query = `
+        SELECT user.id, firstName,  lastName, emailAdress, phonenumber, street, city, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
+        FROM user
+        LEFT JOIN meal ON meal.cookId = user.id
+        WHERE  user.id = ?
+        GROUP BY user.id;`; // SEPARATOR makes sure that the meals can be split.
         db.query(query, [userId], (error, results) => {
             if (error) return callback(error);
     
