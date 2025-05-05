@@ -52,6 +52,28 @@ const userController = {
         });
     },
 
+    getUserById: (req, res, next) => { // UC-203
+        const userId = req.params.userId;
+
+        userService.getUserById(userId, (error, user) => {
+            if (error) return next(error);
+
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found',
+                    data: {}
+                });
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: 'User retrieved successfully',
+                data: user
+            });
+        });
+    },
+
     updateUser: (req, res, next) => { // UC-205
         const userId = req.params.userId;
         const userData = req.body;
