@@ -2,11 +2,12 @@ const userService = require('../services/user.services');
 const validate = require('../util/Validation');
 const logger = require('../util/Logger');
 const { handleValidationError } = require('../util/ErrorHandler'); // Import an specific error handler function
+const bcrypt = require('bcrypt');
 
 const userController = {
     registerUser: (req, res, next) => { // UC-201
         const userData = req.body;
-        
+
         const { error } = validate.registerUserValidation(userData); // Validate the user data using the validation function
         if (error) {
             return handleValidationError(res, error);
@@ -14,7 +15,7 @@ const userController = {
 
         userService.findUserByEmail(userData.emailAdress, (error, existingUser) => {
             if (error) return next(error); // This sends the error to the error handler in util.
-    
+
             if (existingUser) {
                 return res.status(403).json({
                     status: 403,
@@ -22,17 +23,23 @@ const userController = {
                     data: {}
                 });
             }
-    
-            // If no existing user is found, proceed with registration
-            logger.info('Received user data:', userData); // Logs the received user data
-    
-            userService.registerUser(userData, (error, result) => {
-                if (error) return next(error); // This sends the error to the error handler in util.
-    
-                res.status(201).json({
-                    status: 201,
-                    message: 'User registered successfully',
-                    data: result
+
+            // Hash het wachtwoord voordat de gebruiker wordt geregistreerd
+            bcrypt.hash(userData.password, 10, (err, hashedPassword) => {
+                if (error) return next(error);
+
+                // Vervang het wachtwoord door de gehashte versie
+                userData.password = hashedPassword;
+
+                // Registreer de gebruiker
+                userService.registerUser(userData, (error, result) => {
+                    if (error) return next(error);
+
+                    res.status(201).json({
+                        status: 201,
+                        message: 'User registered successfully',
+                        data: result
+                    });
                 });
             });
         });

@@ -84,11 +84,11 @@ const userServices = {
         LEFT JOIN meal ON meal.cookId = user.id AND meal.dateTime >= NOW()
         WHERE  user.id = ? 
         GROUP BY user.id;`; // SEPARATOR makes sure that the meals can be split.
-        db.query(query, [userId], (error, results) => {
+        db.query(query, [userId], (error, result) => {
             if (error) return callback(error);
     
-            logger.info('User found:', results[0]);
-            return callback(null, results[0]);
+            logger.info('User found:', result);
+            return callback(null, result);
         });
     },
 
