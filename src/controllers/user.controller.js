@@ -59,7 +59,30 @@ const userController = {
         });
     },
 
-    getUserById: (req, res, next) => { // UC-203
+    getUserProfile: (req, res, next) => { // UC-203
+        const userId = req.user.userId; // Get the userId from the token
+        logger.info('User ID from token:', userId); // Log the userId for debugging
+        
+        userService.getUserById(userId, (error, user) => {
+            if (error) return next(error);
+
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found',
+                    data: {}
+                });
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: 'User profile retrieved successfully',
+                data: user
+            });
+        });
+    },
+
+    getUserById: (req, res, next) => { // UC-204
         const userId = req.params.userId;
 
         userService.getUserById(userId, (error, user) => {
