@@ -84,16 +84,13 @@ const userController = {
     updateUser: (req, res, next) => { // UC-205
         const userId = req.params.userId;
         const userData = req.body;
+        const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        const { error } = validate.updateUserValidation(userData); // Validate the user data using the validation function
-        if (error) {
-            return handleValidationError(res, error);
-        }
-
-        userService.updateUser(userId, userData, (error, result) => {
+        userService.getUserById(userId, (error, result) => {
             if (error) return next(error);
 
-            if (result.affectedRows === 0) {
+            const user = result[0]; // Get the first user from the result
+            if (!user) {
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -101,21 +98,41 @@ const userController = {
                 });
             }
 
-            res.status(200).json({
-                status: 200,
-                message: 'User updated successfully',
-                data: result // No {} here, so the result is not wrapped in an object
+            if (loggedInUserId !== userId) {
+                return next({
+                    status: 403,
+                    message: "User is not the owner of this account",
+                    data: {}
+                });
+            }
+
+            const { error: validationError } = validate.updateUserValidation(userData); // Validate the user data using the validation function
+            if (validationError) {
+                return handleValidationError(res, validationError);
+            }
+
+            userService.updateUser(userId, userData, (error, result) => {
+                if (error) return next(error);
+    
+                res.status(200).json({
+                    status: 200,
+                    message: 'User updated successfully',
+                    data: result // No {} here, so the result is not wrapped in an object
+                });
             });
+
         });
     },
 
     deleteUser: (req, res, next) => { // UC-206
         const userId = req.params.userId;
+        const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        userService.deleteUser(userId, (error, result) => {
+        userService.getUserById(userId, (error, result) => {
             if (error) return next(error);
 
-            if (result.affectedRows === 0) {
+            const user = result[0]; // Get the first user from the result
+            if (!user) {
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -123,14 +140,25 @@ const userController = {
                 });
             }
 
-            res.status(200).json({
-                status: 200,
-                message: `User with ID ${userId} is deleted`,
-                data: {}
+            if (loggedInUserId !== userId) {
+                return next({
+                    status: 403,
+                    message: "User is not the owner of this account",
+                    data: {}
+                });
+            }
+
+            userService.deleteUser(userId, (error, result) => {
+                if (error) return next(error);
+    
+                res.status(200).json({
+                    status: 200,
+                    message: `User with ID ${userId} is deleted`,
+                    data: {}
+                });
             });
         });
     }
-
 }
 
 module.exports = userController;
