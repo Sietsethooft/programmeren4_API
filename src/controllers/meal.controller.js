@@ -8,7 +8,13 @@ const mealController = {
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
         const { error } = validation.createMealValidation(mealData); // Validate the meal data
-        if (error) return next(error); // If validation fails, send error to the error handler
+        if (error) {
+            return res.status(400).json({
+            status: 400,
+            message: error.message,
+            data: {}
+            });
+        } 
 
         mealService.createMeal(mealData, loggedInUserId, (error, result) => {
             if (error) return next(error); // This sends the error to the error handler in util.
