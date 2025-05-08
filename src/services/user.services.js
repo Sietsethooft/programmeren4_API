@@ -21,7 +21,6 @@ const userServices = {
                 street,
                 city,
                 emailAdress,
-                password,
                 phonenumber
               });
         });
