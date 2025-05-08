@@ -19,7 +19,28 @@ const mealService = {
 
             callback(null, createdMeal);
         });
-    }
+    },
+
+    getAllMeals: (callback) => { // UC-303
+        const query = `SELECT * FROM meal`;
+
+        db.query(query, (error, results) => {
+            if (error) return callback(error);
+
+            const meals = results.map(meal => ({
+                id: meal.id,
+                name: meal.name,
+                description: meal.description,
+                price: meal.price,
+                dateTime: meal.dateTime,
+                maxAmountOfParticipants: meal.maxAmountOfParticipants,
+                imageUrl: meal.imageUrl,
+                cookId: meal.cookId,
+            }));
+
+            callback(null, meals);
+        });
+    },
 }
 
 module.exports = mealService;
