@@ -87,6 +87,12 @@ const userServices = {
         db.query(query, [userId], (error, result) => {
             if (error) return callback(error);
     
+            if (result.length === 0) {
+                // Return null if no user is found
+                logger.info('No user found with ID:', userId);
+                return callback(null, null);
+            }
+            
             const user = result[0]; // Get the first user from the result
     
             // Split the meals string into an array, or return an empty array if no meals exist

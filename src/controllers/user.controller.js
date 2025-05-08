@@ -111,10 +111,9 @@ const userController = {
         const userData = req.body;
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        userService.getUserById(userId, (error, result) => {
+        userService.getUserById(userId, (error, user) => {
             if (error) return next(error);
 
-            const user = result[0]; // Get the first user from the result
             if (!user) {
                 return res.status(404).json({
                     status: 404,
@@ -133,7 +132,7 @@ const userController = {
 
             const { error: validationError } = validate.updateUserValidation(userData); // Validate the user data using the validation function
             if (validationError) {
-                return handleValidationError(res, validationError);
+                return handleValidationErrorUser(res, validationError);
             }
 
             userService.updateUser(userId, userData, (error, result) => {
