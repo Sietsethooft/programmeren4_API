@@ -1,7 +1,7 @@
 const userService = require('../services/user.services');
 const validate = require('../util/Validation');
 const logger = require('../util/Logger');
-const { handleValidationError } = require('../util/ErrorHandler'); // Import an specific error handler function
+const { handleValidationErrorUser } = require('../util/ErrorHandler'); // Import an specific error handler function
 const bcrypt = require('bcrypt');
 
 const userController = {
@@ -10,7 +10,7 @@ const userController = {
 
         const { error } = validate.registerUserValidation(userData); // Validate the user data using the validation function
         if (error) {
-            return handleValidationError(res, error);
+            return handleValidationErrorUser(res, error);
         }
 
         userService.findUserByEmail(userData.emailAdress, (error, existingUser) => {

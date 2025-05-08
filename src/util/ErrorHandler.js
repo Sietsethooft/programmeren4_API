@@ -12,8 +12,8 @@ function errorHandler(error, req, res, next) {
     });
 }
 
-// Specific error handler for validation errors
-function handleValidationError(res, error) {
+// Specific error handler for validation errors in users
+function handleValidationErrorUser(res, error) {
     if (error) {
         let errorMessage = '';
         switch (error.details[0].context.key) { // Check the key of the error to provide a specific message
@@ -38,4 +38,20 @@ function handleValidationError(res, error) {
     }
 }
 
-module.exports = { errorHandler, handleValidationError };
+// Specific error handler for validation errors in meals
+function handleValidationErrorMeal(res, error) {
+    if (error) {
+        let errorMessage = '';
+        switch (error.details[0].context.key) { // Check the key of the error to provide a specific message
+            default:
+                errorMessage = error.details[0].message; // Default error message when no specific case is matched
+    }
+
+    return res.status(400).json({
+        status: 400,
+        message: 'Validation error: ' + errorMessage,
+        data: {}
+    })};
+}
+
+module.exports = { errorHandler, handleValidationErrorUser, handleValidationErrorMeal };
