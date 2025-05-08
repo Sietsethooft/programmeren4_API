@@ -6,6 +6,7 @@ const { errorHandler } = require('./src/util/ErrorHandler');
 const dotenv = require('dotenv');
 const userRoutes = require('./src/routes/user.routes');
 const authRoutes = require('./src/routes/auth.routes');
+const mealRoutes = require('./src/routes/meal.routes');
 require('dotenv').config();
 
 const app = express();
@@ -32,6 +33,7 @@ app.get('/test-error', (req, res, next) => {
 // Route connection
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', mealRoutes);
 
 app.use(errorHandler);
 
