@@ -83,7 +83,7 @@ const userController = {
     },
 
     getUserById: (req, res, next) => { // UC-204
-        const userId = req.params.userId;
+        const userId = parseInt(req.params.userId, 10);
 
         userService.getUserById(userId, (error, user) => {
             if (error) return next(error);
@@ -105,7 +105,7 @@ const userController = {
     },
 
     updateUser: (req, res, next) => { // UC-205
-        const userId = req.params.userId;
+        const userId = parseInt(req.params.userId, 10);
         const userData = req.body;
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
@@ -148,7 +148,7 @@ const userController = {
     },
 
     deleteUser: (req, res, next) => { // UC-206
-        const userId = req.params.userId;
+        const userId = parseInt(req.params.userId, 10);
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
         userService.getUserById(userId, (error, result) => {
