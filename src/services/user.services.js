@@ -78,16 +78,22 @@ const userServices = {
 
     getUserById: (userId, callback) => {
         const query = `
-        SELECT user.id, firstName,  lastName, emailAdress, phonenumber, street, city, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
-        FROM user
-        LEFT JOIN meal ON meal.cookId = user.id AND meal.dateTime >= NOW()
-        WHERE  user.id = ? 
-        GROUP BY user.id;`; // SEPARATOR makes sure that the meals can be split.
+            SELECT user.id, firstName, lastName, emailAdress, phonenumber, street, city, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
+            FROM user
+            LEFT JOIN meal ON meal.cookId = user.id AND meal.dateTime >= NOW()
+            WHERE user.id = ?
+            GROUP BY user.id;`; // SEPARATOR makes sure that the meals can be split.
+    
         db.query(query, [userId], (error, result) => {
             if (error) return callback(error);
     
-            logger.info('User found:', result);
-            return callback(null, result);
+            const user = result[0]; // Get the first user from the result
+    
+            // Split the meals string into an array, or return an empty array if no meals exist
+            user.meals = user.meals ? user.meals.split('; ') : [];
+    
+            logger.info('User found:', user);
+            return callback(null, user); // Return the modified user object
         });
     },
 
