@@ -27,6 +27,19 @@ const validation = {
         });
 
         return schema.validate(data);
+    },
+
+    createMealValidation: (data) => {
+        const schema = joi.object({
+            name: joi.string().required(),
+            description: joi.string().required(),
+            price: joi.number().required(),
+            dateTime: joi.date().iso().required(),
+            maxAmountOfParticipants: joi.number().integer().min(1).required(),
+            imageUrl: joi.string().required(),
+        });
+
+        return schema.validate(data);
     }
 }
 
