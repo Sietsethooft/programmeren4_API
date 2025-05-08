@@ -4,10 +4,7 @@ const logger = require('../util/Logger');
 const authMiddleware = {
     authenticateToken: (req, res, next) => {
         const authHeader = req.headers['authorization']; // Get the authorization header from the request
-        logger.trace('Authorization header:', authHeader);
-
         const token = authHeader && authHeader.split(' ')[1]; // Extract the token from the header
-        logger.trace('Extracted token:', token);
 
         if (!token) {
             return res.status(401).json({
