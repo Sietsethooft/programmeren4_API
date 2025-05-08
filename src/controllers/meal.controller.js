@@ -25,7 +25,19 @@ const mealController = {
                 data: result
             });
         });
-    }
+    },
+
+    getAllMeals: (req, res, next) => { // UC-303
+        mealService.getAllMeals( (error, meals) => {
+            if (error) return next(error); // This sends the error to the error handler in util.
+
+            res.status(200).json({
+                status: 200,
+                message: 'Meals retrieved successfully',
+                data: meals
+            });
+        });
+    },
 }
 
 module.exports = mealController;
