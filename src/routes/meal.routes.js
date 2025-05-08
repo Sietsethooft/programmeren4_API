@@ -6,4 +6,6 @@ const mealRoutes = express.Router();
 
 mealRoutes.post('/meal', authMiddleware.authenticateToken, mealController.createMeal);
 
+mealRoutes.get('/meal', mealController.getAllMeals); 
+
 module.exports = mealRoutes;
