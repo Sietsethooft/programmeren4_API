@@ -217,6 +217,16 @@ const mealService = {
         });
     },
     
+    deleteMeal: (mealId, loggedInUserId, callback) => {
+        const query = `DELETE FROM meal WHERE id = ? AND cookId = ?`;
+        const params = [mealId, loggedInUserId];
+
+        db.query(query, params, (error, result) => {
+            if (error) return callback(error);
+
+            callback(null, result);
+        });
+    },
 }
 
 module.exports = mealService;
