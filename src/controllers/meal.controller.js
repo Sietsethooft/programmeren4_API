@@ -34,7 +34,7 @@ const mealController = {
             res.status(200).json({
                 status: 200,
                 message: 'Meals retrieved successfully',
-                data: meals
+                data: {meals}
             });
         });
     },
