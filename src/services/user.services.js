@@ -87,11 +87,7 @@ const userServices = {
         db.query(query, [userId], (error, result) => {
             if (error) return callback(error);
     
-            if (result.length === 0) {
-                // Return null if no user is found
-                logger.info('No user found with ID:', userId);
-                return callback(null, null);
-            }
+            if (result.length === 0) return callback(null, null); // No users found
             
             const user = result[0]; // Get the first user from the result
     
