@@ -227,6 +227,48 @@ const mealService = {
             callback(null, result);
         });
     },
+
+    updateMeal: (mealId, mealData, callback) => {
+        const allowedFields = ['name', 'description', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'dateTime', 'maxAmountOfParticipants', 'imageUrl', 'allergenes'];
+        const updates = [];
+        const params = [];
+
+        // Dynamically build the update query based on provided fields
+        allowedFields.forEach((field) => {
+            if (mealData[field] !== undefined) {
+                if (field === 'allergenes' && Array.isArray(mealData[field])) {
+                    // Set the allergenes field as a comma-separated string
+                    updates.push(`${field} = ?`);
+                    params.push(mealData[field].join(',')); // Convert array to comma-separated string
+                } else {
+                    updates.push(`${field} = ?`);
+                    params.push(mealData[field]);
+                }
+            }
+        });
+
+        if (updates.length === 0) { // For emurgencies
+            return callback(new Error('No valid fields provided to update.'));
+        }
+
+        const query = `
+            UPDATE meal
+            SET ${updates.join(', ')}
+            WHERE id = ?
+        `;
+        params.push(mealId); // Add mealId to the end of the params array
+
+        db.query(query, params, (error, result) => {
+            if (error) return callback(error);
+
+            const updatedMeal = {
+                id: mealId,
+                ...mealData, // Only include the fields that were updated
+            };
+
+            callback(null, updatedMeal);
+        });
+    },
 }
 
 module.exports = mealService;
