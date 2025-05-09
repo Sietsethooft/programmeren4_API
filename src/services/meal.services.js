@@ -203,7 +203,20 @@ const mealService = {
             callback(null, meals);
         });
         
-    }
+    },
+
+    getCookId: (mealId, callback) => {
+        const query = `SELECT cookId FROM meal WHERE id = ?`;
+        db.query(query, [mealId], (error, result) => {
+            if (error) return callback(error);
+
+            if (result.length === 0) return callback(null, null); // No meal found
+
+            const cookId = result[0].cookId;
+            callback(null, cookId);
+        });
+    },
+    
 }
 
 module.exports = mealService;
