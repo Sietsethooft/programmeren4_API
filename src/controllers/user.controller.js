@@ -152,10 +152,9 @@ const userController = {
         const userId = parseInt(req.params.userId, 10);
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        userService.getUserById(userId, (error, result) => {
+        userService.getUserById(userId, (error, user) => {
             if (error) return next(error);
 
-            const user = result[0]; // Get the first user from the result
             if (!user) {
                 return res.status(404).json({
                     status: 404,
