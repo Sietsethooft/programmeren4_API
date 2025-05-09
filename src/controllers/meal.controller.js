@@ -38,6 +38,28 @@ const mealController = {
             });
         });
     },
+
+    getMealById: (req, res, next) => { // UC-302
+        const mealId = parseInt(req.params.mealId, 10);
+
+        mealService.getMealById(mealId, (error, meal) => {
+            if (error) return next(error); // This sends the error to the error handler in util.
+
+            if (!meal) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'Meal not found',
+                    data: {}
+                });
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: 'Meal retrieved successfully',
+                data: meal
+            });
+        });
+    }
 }
 
 module.exports = mealController;
