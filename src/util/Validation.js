@@ -27,6 +27,37 @@ const validation = {
         });
 
         return schema.validate(data);
+    },
+
+    createMealValidation: (data) => {
+        const schema = joi.object({
+            name: joi.string().required(),
+            description: joi.string().required(),
+            price: joi.number().required(),
+            dateTime: joi.date().iso().required(),
+            maxAmountOfParticipants: joi.number().integer().min(1).required(),
+            imageUrl: joi.string().required(),
+        });
+
+        return schema.validate(data);
+    },
+
+    updateMealValidation: (data) => {
+        const schema = joi.object({
+            name: joi.string().required(),
+            price: joi.number().required(),
+            maxAmountOfParticipants: joi.number().integer().min(1).required(),
+            description: joi.string(),
+            dateTime: joi.date().iso(),
+            imageUrl: joi.string(),
+            isVegan: joi.number(),
+            isVega: joi.number(),
+            isToTakeHome: joi.number(),
+            isActive: joi.number(),
+            allergenes: joi.array().items(joi.string()),
+        });
+
+        return schema.validate(data);
     }
 }
 

@@ -21,7 +21,6 @@ const userServices = {
                 street,
                 city,
                 emailAdress,
-                password,
                 phonenumber
               });
         });
@@ -77,6 +76,29 @@ const userServices = {
         });
     },
 
+    getUserById: (userId, callback) => {
+        const query = `
+            SELECT user.id, firstName, lastName, emailAdress, phonenumber, street, city, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
+            FROM user
+            LEFT JOIN meal ON meal.cookId = user.id AND meal.dateTime >= NOW()
+            WHERE user.id = ?
+            GROUP BY user.id;`; // SEPARATOR makes sure that the meals can be split.
+    
+        db.query(query, [userId], (error, result) => {
+            if (error) return callback(error);
+    
+            if (result.length === 0) return callback(null, null); // No users found
+            
+            const user = result[0]; // Get the first user from the result
+    
+            // Split the meals string into an array, or return an empty array if no meals exist
+            user.meals = user.meals ? user.meals.split('; ') : [];
+    
+            logger.info('User found:', user);
+            return callback(null, user); // Return the modified user object
+        });
+    },
+
     updateUser: (userId, userData, callback) => {
         const { firstName, lastName, street, city, emailAdress, password, phonenumber } = userData; // Destructure userData
     
@@ -89,15 +111,27 @@ const userServices = {
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber, userId], (error, results) => {
             if (error) return callback(error);
     
-            logger.info('User updated successfully:', results);
+            logger.info('User updated successfully:', { userId, ...userData });
             return callback(null, { 
                 firstName,
                 lastName,
                 street,
                 city,
                 emailAdress,
-                phonenumber
+                phonenumber,
+                password
             });
+        });
+    },
+
+    deleteUser: (userId, callback) => {
+        const query = `DELETE FROM user WHERE id = ?`;
+    
+        db.query(query, [userId], (error, result) => { // Gebruik result van de query
+            if (error) return callback(error);
+    
+            logger.info('User deleted successfully:', { userId, affectedRows: result.affectedRows });
+            return callback(null, result);
         });
     }
 };

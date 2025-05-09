@@ -1,20 +1,21 @@
 const userService = require('../services/user.services');
 const validate = require('../util/Validation');
 const logger = require('../util/Logger');
-const { handleValidationError } = require('../util/ErrorHandler'); // Import an specific error handler function
+const { handleValidationErrorUser } = require('../util/ErrorHandler'); // Import an specific error handler function
+const bcrypt = require('bcrypt');
 
 const userController = {
     registerUser: (req, res, next) => { // UC-201
         const userData = req.body;
-        
+
         const { error } = validate.registerUserValidation(userData); // Validate the user data using the validation function
         if (error) {
-            return handleValidationError(res, error);
+            return handleValidationErrorUser(res, error);
         }
 
         userService.findUserByEmail(userData.emailAdress, (error, existingUser) => {
             if (error) return next(error); // This sends the error to the error handler in util.
-    
+
             if (existingUser) {
                 return res.status(403).json({
                     status: 403,
@@ -22,17 +23,25 @@ const userController = {
                     data: {}
                 });
             }
-    
-            // If no existing user is found, proceed with registration
-            logger.info('Received user data:', userData); // Logs the received user data
-    
-            userService.registerUser(userData, (error, result) => {
-                if (error) return next(error); // This sends the error to the error handler in util.
-    
-                res.status(201).json({
-                    status: 201,
-                    message: 'User registered successfully',
-                    data: result
+
+            const plainPassword = userData.password; // Store the plain password, so it can be returned in the response (without bcrypt)
+
+            // Hash het wachtwoord voordat de gebruiker wordt geregistreerd
+            bcrypt.hash(userData.password, 10, (err, hashedPassword) => {
+                if (error) return next(error);
+
+                // Vervang het wachtwoord door de gehashte versie
+                userData.password = hashedPassword;
+
+                // Registreer de gebruiker
+                userService.registerUser(userData, (error, result) => {
+                    if (error) return next(error);
+
+                    res.status(201).json({
+                        status: 201,
+                        message: 'User registered successfully',
+                        data: { ...result, password: plainPassword }
+                    });
                 });
             });
         });
@@ -42,31 +51,24 @@ const userController = {
         const filters = req.query;
 
         userService.getAllUsers(filters, (error, users) => {
-            if (error) return next(error); // This sends the error to the error handler in util.
+            if (error) return next(error);
     
             res.status(200).json({
                 status: 200,
                 message: 'Users retrieved successfully',
-                data: {
-                    users
-                }
+                data: {users}
             });
         });
     },
 
-    updateUser: (req, res, next) => { // UC-203
-        const userId = req.params.userId;
-        const userData = req.body;
+    getUserProfile: (req, res, next) => { // UC-203
+        const userId = req.user.userId; // Get the userId from the token
+        logger.info('User ID from token:', userId); // Log the userId for debugging
+        
+        userService.getUserById(userId, (error, user) => {
+            if (error) return next(error);
 
-        const { error } = validate.updateUserValidation(userData); // Validate the user data using the validation function
-        if (error) {
-            return handleValidationError(res, error);
-        }
-
-        userService.updateUser(userId, userData, (error, result) => {
-            if (error) return next(error); // This sends the error to the error handler in util.
-
-            if (result.affectedRows === 0) {
+            if (!user) {
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -76,8 +78,107 @@ const userController = {
 
             res.status(200).json({
                 status: 200,
-                message: 'User updated successfully',
-                data: result
+                message: 'User profile retrieved successfully',
+                data: user
+            });
+        });
+    },
+
+    getUserById: (req, res, next) => { // UC-204
+        const userId = parseInt(req.params.userId, 10);
+
+        userService.getUserById(userId, (error, user) => {
+            if (error) return next(error);
+
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found',
+                    data: {}
+                });
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: 'User retrieved successfully',
+                data: user
+            });
+        });
+    },
+
+    updateUser: (req, res, next) => { // UC-205
+        const userId = parseInt(req.params.userId, 10);
+        const userData = req.body;
+        const loggedInUserId = req.user.userId; // Get the userId from the token
+
+        userService.getUserById(userId, (error, user) => {
+            if (error) return next(error);
+
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found',
+                    data: {}
+                });
+            }
+
+            if (loggedInUserId !== userId) {
+                return next({
+                    status: 403,
+                    message: "User is not the owner of this account",
+                    data: {}
+                });
+            }
+
+            const { error: validationError } = validate.updateUserValidation(userData); // Validate the user data using the validation function
+            if (validationError) {
+                return handleValidationErrorUser(res, validationError);
+            }
+
+            userService.updateUser(userId, userData, (error, result) => {
+                if (error) return next(error);
+    
+                res.status(200).json({
+                    status: 200,
+                    message: 'User updated successfully',
+                    data: result // No {} here, so the result is not wrapped in an object
+                });
+            });
+
+        });
+    },
+
+    deleteUser: (req, res, next) => { // UC-206
+        const userId = parseInt(req.params.userId, 10);
+        const loggedInUserId = req.user.userId; // Get the userId from the token
+
+        userService.getUserById(userId, (error, user) => {
+            if (error) return next(error);
+
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found',
+                    data: {}
+                });
+            }
+
+            if (loggedInUserId !== userId) {
+                return next({
+                    status: 403,
+                    message: "User is not the owner of this account",
+                    data: {}
+                });
+            }
+
+            userService.deleteUser(userId, (error, result) => {
+                if (error) return next(error);
+    
+                res.status(200).json({
+                    status: 200,
+                    message: `User with ID ${userId} is deleted`,
+                    data: {}
+                });
             });
         });
     }
