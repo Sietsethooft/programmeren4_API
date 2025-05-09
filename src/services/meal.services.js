@@ -200,6 +200,7 @@ const mealService = {
             });
 
             const meals = Array.from(mealsMap.values());
+            logger.info('Meal retrieved successfully:', meals);
             callback(null, meals);
         });
         
@@ -213,6 +214,8 @@ const mealService = {
             if (result.length === 0) return callback(null, null); // No meal found
 
             const cookId = result[0].cookId;
+
+            logger.info('Cook ID retrieved successfully:', { mealId, cookId });
             callback(null, cookId);
         });
     },
@@ -223,6 +226,8 @@ const mealService = {
 
         db.query(query, params, (error, result) => {
             if (error) return callback(error);
+
+            logger.info('Meal deleted successfully:', { mealId, loggedInUserId });
 
             callback(null, result);
         });
@@ -258,6 +263,8 @@ const mealService = {
         `;
         params.push(mealId); // Add mealId to the end of the params array
 
+        logger.info('Executing query:', query, params);
+
         db.query(query, params, (error, result) => {
             if (error) return callback(error);
 
@@ -265,6 +272,8 @@ const mealService = {
                 id: mealId,
                 ...mealData, // Only include the fields that were updated
             };
+
+            logger.info('Meal updated successfully:', updatedMeal);
 
             callback(null, updatedMeal);
         });
