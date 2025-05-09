@@ -42,9 +42,10 @@ const mealController = {
     getMealById: (req, res, next) => { // UC-302
         const mealId = parseInt(req.params.mealId, 10);
 
-        mealService.getMealById(mealId, (error, meal) => {
+        mealService.getMealById(mealId, (error, result) => {
             if (error) return next(error); // This sends the error to the error handler in util.
 
+            meal = result[0]; // Get the first meal from the result
             if (!meal) {
                 return res.status(404).json({
                     status: 404,
@@ -57,6 +58,41 @@ const mealController = {
                 status: 200,
                 message: 'Meal retrieved successfully',
                 data: meal
+            });
+        });
+    },
+
+    deleteMeal: (req, res, next) => { // UC-305
+        const mealId = parseInt(req.params.mealId, 10);
+        const loggedInUserId = req.user.userId; // Get the userId from the token
+
+        mealService.getCookId(mealId, (error, cookId) => {
+            if (error) return next(error); // This sends the error to the error handler in util.
+
+            if (!cookId) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'Meal not found',
+                    data: {}
+                });
+            }
+
+            if (loggedInUserId !== cookId) {
+                return next({
+                    status: 403,
+                    message: "User is not the owner of this meal",
+                    data: {}
+                });
+            }
+
+            mealService.deleteMeal(mealId, loggedInUserId, (error, result) => {
+                if (error) return next(error); // This sends the error to the error handler in util.
+
+                res.status(200).json({
+                    status: 200,
+                    message: `Meal with ID ${mealId} deleted successfully`,
+                    data: {}
+                });
             });
         });
     }
