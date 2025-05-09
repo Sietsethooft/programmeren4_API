@@ -9,4 +9,5 @@ mealRoutes.post('/meal', authMiddleware.authenticateToken, mealController.create
 mealRoutes.get('/meal', mealController.getAllMeals); 
 mealRoutes.get('/meal/:mealId', mealController.getMealById); 
 
+mealRoutes.delete('/meal/:mealId', authMiddleware.authenticateToken, mealController.deleteMeal);
 module.exports = mealRoutes;
