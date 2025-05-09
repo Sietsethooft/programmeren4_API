@@ -78,7 +78,7 @@ const mealService = {
                         maxAmountOfParticipants: row.maxAmountOfParticipants,
                         price: row.price,
                         imageUrl: row.imageUrl,
-                        allergenes: row.allergenes ? row.allergenes.split(',') : [],
+                        allergenes: row.allergenes ? row.allergenes.split(',') : [], // Split allergenes into an array
                         cook: {
                             id: row.cookId,
                             firstName: row.cookFirstName,
@@ -93,7 +93,7 @@ const mealService = {
                     });
                 }
 
-                if (row.participantId) {
+                if (row.participantId) { // Only add participants if they exist
                     mealsMap.get(row.mealId).participants.push({
                         id: row.participantId,
                         firstName: row.participantFirstName,
