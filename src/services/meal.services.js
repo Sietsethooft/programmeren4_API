@@ -252,7 +252,7 @@ const mealService = {
             }
         });
 
-        if (updates.length === 0) { // For emurgencies
+        if (updates.length === 0) { // For emergency
             return callback(new Error('No valid fields provided to update.'));
         }
 
