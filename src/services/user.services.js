@@ -78,7 +78,7 @@ const userServices = {
 
     getUserById: (userId, callback) => {
         const query = `
-            SELECT user.id, firstName, lastName, emailAdress, phonenumber, street, city, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
+            SELECT user.id, firstName, lastName, emailAdress, phonenumber, street, city, user.isActive, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
             FROM user
             LEFT JOIN meal ON meal.cookId = user.id AND meal.dateTime >= NOW()
             WHERE user.id = ?
@@ -100,26 +100,35 @@ const userServices = {
     },
 
     updateUser: (userId, userData, callback) => {
-        const { firstName, lastName, street, city, emailAdress, password, phonenumber } = userData; // Destructure userData
-    
+        const allowedFields = ['firstName', 'lastName', 'street', 'city', 'emailAdress', 'password', 'phonenumber']; // Allowed fields for updating
+        const updates = [];
+        const params = [];
+        // Dynamically build the update query based on provided fields
+        allowedFields.forEach((field) => {
+            if (userData[field] !== undefined) {
+                updates.push(`${field} = ?`);
+                params.push(userData[field]);
+            }
+        });
+
+        if (updates.length === 0) { // For emergency
+            return callback(new Error('No valid fields provided to update.'));
+        }
+
         const query = `
             UPDATE user
-            SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, phonenumber = ?
+            SET ${updates.join(', ')}
             WHERE id = ?
         `;
-    
-        db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber, userId], (error, results) => {
+        params.push(userId); // Add mealId to the end of the params array
+
+        db.query(query, params, (error, results) => {
             if (error) return callback(error);
-    
+
             logger.info('User updated successfully:', { userId, ...userData });
-            return callback(null, { 
-                firstName,
-                lastName,
-                street,
-                city,
-                emailAdress,
-                phonenumber,
-                password
+            return callback(null, {
+                id: userId,
+                ...userData // Only include the fields that were updated
             });
         });
     },
@@ -127,7 +136,7 @@ const userServices = {
     deleteUser: (userId, callback) => {
         const query = `DELETE FROM user WHERE id = ?`;
     
-        db.query(query, [userId], (error, result) => { // Gebruik result van de query
+        db.query(query, [userId], (error, result) => { // Uses the result from the query to check if the user was deleted
             if (error) return callback(error);
     
             logger.info('User deleted successfully:', { userId, affectedRows: result.affectedRows });
