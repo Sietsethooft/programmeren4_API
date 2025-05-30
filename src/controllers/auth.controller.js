@@ -41,7 +41,7 @@ const authController = {
                 // Generate JWT token
                 const payload = { userId: user.id, emailAdress: user.emailAdress };
                 const secret = process.env.JWT_SECRET;
-                const options = { expiresIn: '1y' };
+                const options = { expiresIn: '1h' };
         
                 jwt.sign(payload, secret, options, (error, token) => {
                     if (error) return next(error);
