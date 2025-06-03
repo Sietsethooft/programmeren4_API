@@ -27,6 +27,7 @@ const authController = {
                 });
             }
 
+            let plainPassword = password; // Stores the plain password for later use
             bcrypt.compare(password, user.password, (error, isMatch) => { // Validates the password
                 if (error) return next(error);
         
@@ -51,7 +52,9 @@ const authController = {
                         id: user.id,
                         firstName: user.firstName,
                         lastName: user.lastName,
+                        isActive: user.isActive,
                         emailAdress: user.emailAdress,
+                        password: plainPassword,
                         phonenumber: user.phoneNumber,
                         street: user.street,
                         city: user.city

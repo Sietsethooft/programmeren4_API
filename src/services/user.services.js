@@ -15,13 +15,14 @@ const userServices = {
     
             logger.info('User registered successfully:', results.insertId);
             return callback(null, { // Return the inserted user data with the generated ID
-                userId: results.insertId,
+                id: results.insertId,
                 firstName,
                 lastName,
                 street,
                 city,
                 emailAdress,
-                phonenumber
+                phonenumber,
+                isActive: 1 // Default value for isActive
               });
         });
     },
