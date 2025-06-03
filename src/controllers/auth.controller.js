@@ -31,8 +31,8 @@ const authController = {
                 if (error) return next(error);
         
                 if (!isMatch) {
-                    return res.status(401).json({
-                        status: 401,
+                    return res.status(400).json({
+                        status: 400,
                         message: 'Invalid password or email.',
                         data: {}
                     });
