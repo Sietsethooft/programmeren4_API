@@ -46,7 +46,7 @@ const userServices = {
         let query = 'SELECT id, firstName, lastName, emailAdress, phonenumber, isActive, street, city FROM user';
         const values = []; 
     
-        const allowedFields = ['firstName', 'lastName', 'isActive', 'emailAdress', 'city']; // All allowed fields for filtering
+        const allowedFields = ['firstName', 'lastName', 'isActive', 'emailAdress', 'city', 'street', 'phonenumber']; // All allowed fields for filtering
         const filterKeys = Object.keys(filters).filter(key => allowedFields.includes(key)); // Filter keys based on allowed fields
         
         if (filterKeys.length > 2) {
