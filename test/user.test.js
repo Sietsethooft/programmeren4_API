@@ -103,7 +103,6 @@ describe('UC-201 register', () => {
     //             expect(res).to.have.status(201);
     //             expect(res.body).to.have.property('data');
     //             expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
-    //             userId = res.body.data.id; // Store the user ID for future requests
     //             done();
     //         });
     // });
@@ -265,6 +264,7 @@ describe('UC-203 get user by profile', () => {
             .get('/api/user/profile')
             .set('Authorization', `Bearer ${token}`) // Use the token for authentication
             .end((err, res) => {
+                userId = res.body.data.id; // Store the user ID for future requests
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
                 expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber', 'meals');	
@@ -273,9 +273,43 @@ describe('UC-203 get user by profile', () => {
     });
 });
 
-// describe('UC-204 get user by id', () => {
+describe('UC-204 get user by id', () => {
+    // TC-204-1: Get user by id without authentication
+    it('TC-204-1: should return 401 if user is not authenticated', (done) => {
+        chai.request(app)
+            .get(`/api/user/${userId}`) // Use the stored userId from registration
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                done();
+            });
+    });
+    
+    // TC-204-2: Get user by non-existing id
+    it('TC-204-2: should return 404 if user does not exist', (done) => {
+        chai.request(app)
+            .get('/api/user/999949309') // invalid user ID
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                done();
+            });
+    });
 
-// });
+    // TC-204-3: Get user by id with valid token
+    it('TC-204-3: should return 200 and user data for valid user ID', (done) => {
+        chai.request(app)
+            .get(`/api/user/${userId}`) // Use the stored userId from registration
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber', 'meals');
+                done();
+            });
+    });
+});
 
 // describe('UC-205 update user', () => {
 
