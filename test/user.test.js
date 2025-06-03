@@ -4,6 +4,7 @@ process.env.JWT_SECRET = process.env.JWT_SECRET || 'secret';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const app = require('../index');
+const e = require('express');
 logger = require('../src/util/Logger');
 
 const expect = chai.expect;
@@ -22,6 +23,7 @@ describe('UC-201 register', () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.contains('required');
                 done();
             });
     });
@@ -42,6 +44,7 @@ describe('UC-201 register', () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Validation error: EmailAdress is not in the correct format. An email address needs to follow the pattern: n.last@domain.com where lastname contains at least 2 characters.');
                 done();
             });
     });
@@ -55,13 +58,14 @@ describe('UC-201 register', () => {
                 lastName: 'Johnes', 
                 street: '123 Main St', 
                 city: 'Anytown', 
-                emailAdress: 'm.Johnes@test.com',
+                emailAdress: 'm.johnes@test.com',
                 password: 'notvalid', // invalid password
                 phonenumber: '06-12345678'
             })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Validation error: Password must be at least 8 characters long and include at least one uppercase letter and one number.');
                 done();
             });
     });
@@ -82,6 +86,7 @@ describe('UC-201 register', () => {
             .end((err, res) => {
                 expect(res).to.have.status(403);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('A user with this email address already exists.');
                 done();
             });
     });
@@ -102,6 +107,7 @@ describe('UC-201 register', () => {
     //         .end((err, res) => {
     //             expect(res).to.have.status(201);
     //             expect(res.body).to.have.property('data');
+    //             expect(res.body).to.have.property('message').that.equal('User registered successfully');
     //             expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
     //             done();
     //         });
@@ -118,6 +124,7 @@ describe('UC-101 log in', () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Email address and password are required.');
                 done();
             });
     });
@@ -130,6 +137,7 @@ describe('UC-101 log in', () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Invalid password or email.');
                 done();
             });
     });
@@ -142,6 +150,7 @@ describe('UC-101 log in', () => {
             .end((err, res) => {
                 expect(res).to.have.status(404);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User not found.');
                 done();
             });
     });
@@ -154,6 +163,7 @@ describe('UC-101 log in', () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Login successful.');
                 expect(res.body.data).to.have.property('user');
                 expect(res.body.data).to.have.property('token').that.is.a('string');
                 expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
@@ -172,6 +182,7 @@ describe('UC-202 get all users', () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
                 expect(res.body.data).to.have.property('users').that.is.an('array');
                 expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
                 expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
@@ -186,6 +197,8 @@ describe('UC-202 get all users', () => {
             .set('Authorization', `Bearer ${token}`) // Use the token for authentication
             .end((err, res) => {
                 expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data')
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
                 done();
             });
     });
@@ -198,6 +211,7 @@ describe('UC-202 get all users', () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
                 expect(res.body.data).to.have.property('users').that.is.an('array');
                 res.body.data.users.forEach(user => {
                     expect(user.isActive).to.equal(0); // Check if isActive is false (0)
@@ -216,6 +230,7 @@ describe('UC-202 get all users', () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
                 expect(res.body.data).to.have.property('users').that.is.an('array');
                 res.body.data.users.forEach(user => {
                     expect(user.isActive).to.equal(1); // Check if isActive is true (1)
@@ -234,6 +249,7 @@ describe('UC-202 get all users', () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
                 expect(res.body.data).to.have.property('users').that.is.an('array');
                 res.body.data.users.forEach(user => {
                     expect(user.city).to.equal('Amsterdam'); // Check if city is Amsterdam
@@ -254,6 +270,7 @@ describe('UC-203 get user by profile', () => {
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Access token is missing or invalid.');
                 done();
             });
     });
@@ -267,6 +284,7 @@ describe('UC-203 get user by profile', () => {
                 userId = res.body.data.id; // Store the user ID for future requests
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('User profile retrieved successfully');
                 expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber', 'meals');	
                 done();
             });
@@ -281,6 +299,7 @@ describe('UC-204 get user by id', () => {
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Access token is missing or invalid.');
                 done();
             });
     });
@@ -293,6 +312,7 @@ describe('UC-204 get user by id', () => {
             .end((err, res) => {
                 expect(res).to.have.status(404);
                 expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User not found');
                 done();
             });
     });
@@ -305,6 +325,7 @@ describe('UC-204 get user by id', () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('User retrieved successfully');
                 expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber', 'meals');
                 done();
             });
