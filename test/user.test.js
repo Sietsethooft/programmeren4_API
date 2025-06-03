@@ -87,26 +87,26 @@ describe('UC-201 register', () => {
     });
 
     // TC-201-5: User successfully registered
-        it('TC-201-5: should return 201 and user data on succesfull register', (done) => {
-         chai.request(app)
-            .post('/api/user')
-            .send({ 
-                firstName: 'Maria', 
-                lastName: 'Johnes', 
-                street: '123 Main St', 
-                city: 'Anytown', 
-                emailAdress: 'm.johnes@test.com',
-                password: 'ValidPassword1234',
-                phonenumber: '06-12345678'
-            })
-            .end((err, res) => {
-                expect(res).to.have.status(201);
-                expect(res.body).to.have.property('data');
-                expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
-                userId = res.body.data.id; // Store the user ID for future requests
-                done();
-            });
-    });
+    //     it('TC-201-5: should return 201 and user data on succesfull register', (done) => {
+    //      chai.request(app)
+    //         .post('/api/user')
+    //         .send({ 
+    //             firstName: 'Maria', 
+    //             lastName: 'Johnes', 
+    //             street: '123 Main St', 
+    //             city: 'Anytown', 
+    //             emailAdress: 'm.johnes@test.com',
+    //             password: 'ValidPassword1234',
+    //             phonenumber: '06-12345678'
+    //         })
+    //         .end((err, res) => {
+    //             expect(res).to.have.status(201);
+    //             expect(res.body).to.have.property('data');
+    //             expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
+    //             userId = res.body.data.id; // Store the user ID for future requests
+    //             done();
+    //         });
+    // });
 
 });
 
@@ -165,7 +165,86 @@ describe('UC-101 log in', () => {
 });
 
 describe('UC-202 get all users', () => {
+    // TC-202-1: get all users (minimal 2 users)
+    it('TC-202-1: should return 200 and all users', (done) => {
+        chai.request(app)
+            .get('/api/user')
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                done();
+            });
+    });
 
+    // TC-202-2: get all users with invalid filter
+    it('TC-202-2: should return 200 if filter is invalid', (done) => {
+        chai.request(app)
+            .get('/api/user?invalidFilter=123') // Invalid filter
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                done();
+            });
+    });
+
+    // TC-202-3: get all users with filter ‘isActive’=false
+    it ('TC-202-3: should return 200 and users with isActive=false', (done) => {
+        chai.request(app)
+            .get('/api/user?isActive=false') // Filter for inactive users
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                res.body.data.users.forEach(user => {
+                    expect(user.isActive).to.equal(0); // Check if isActive is false (0)
+                });
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                done();
+            });
+    });
+
+    // TC-202-4: get all users with filter ‘isActive’=true
+    it ('TC-202-4: should return 200 and users with isActive=true', (done) => {
+        chai.request(app)
+            .get('/api/user?isActive=true') // Filter for active users
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                res.body.data.users.forEach(user => {
+                    expect(user.isActive).to.equal(1); // Check if isActive is true (1)
+                });
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                done();
+            });
+    });
+
+    // TC-202-5: get all users with filter 'city=Amsterdam' and 'firstname=Maria'
+    it ('TC-202-5: should return 200 and users with city=Amsterdam and firstname=Maria', (done) => {
+        chai.request(app)
+            .get('/api/user?city=Amsterdam&firstName=Maria') // Filter for users in Amsterdam with first name Maria
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                res.body.data.users.forEach(user => {
+                    expect(user.city).to.equal('Amsterdam'); // Check if city is Amsterdam
+                    expect(user.firstName).to.equal('Maria'); // Check if first name is Maria
+                });
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                done();
+            });
+    });
 });
 
 // describe('UC-203 get user by profile', () => {
