@@ -247,9 +247,31 @@ describe('UC-202 get all users', () => {
     });
 });
 
-// describe('UC-203 get user by profile', () => {
+describe('UC-203 get user by profile', () => {
+    // TC-203-1: Get user profile without authentication
+    it('TC-203-1: should return 401 if user is not authenticated', (done) => {
+        chai.request(app)
+            .get('/api/user/profile')
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                done();
+            });
+    });
 
-// });
+    // TC-203-2: Get user profile with valid token
+    it('TC-203-2: should return 200 and user profile data', (done) => {
+        chai.request(app)
+            .get('/api/user/profile')
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber', 'meals');	
+                done();
+            });
+    });
+});
 
 // describe('UC-204 get user by id', () => {
 
