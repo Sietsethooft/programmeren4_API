@@ -107,7 +107,6 @@ describe('UC-201 register', () => {
                 done();
             });
     });
-describe('UC-202 get user profile', () => {
 
 });
 
@@ -163,18 +162,24 @@ describe('UC-101 log in', () => {
                 done();
             });
     });
-describe('UC-203 get all users', () => {
+});
+
+describe('UC-202 get all users', () => {
 
 });
 
-describe('UC-204 get user by id', () => {
+// describe('UC-203 get user by profile', () => {
 
-});
+// });
 
-describe('UC-205 update user', () => {
-    
-});
+// describe('UC-204 get user by id', () => {
 
-describe('UC-206 delete user', () => {
+// });
 
-});
+// describe('UC-205 update user', () => {
+
+// });
+
+// describe('UC-206 delete user', () => {
+
+// });
