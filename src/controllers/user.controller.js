@@ -24,8 +24,6 @@ const userController = {
                 });
             }
 
-            const plainPassword = userData.password; // Store the plain password, so it can be returned in the response (without bcrypt)
-
             // Hash het wachtwoord voordat de gebruiker wordt geregistreerd
             bcrypt.hash(userData.password, 10, (err, hashedPassword) => {
                 if (error) return next(error);
@@ -40,7 +38,7 @@ const userController = {
                     res.status(201).json({
                         status: 201,
                         message: 'User registered successfully',
-                        data: { user: { ...result, password: plainPassword }}
+                        data: { user: result}
                     });
                 });
             });

@@ -112,7 +112,7 @@ describe('UC-201 register', () => {
                 expect(res.body).to.have.property('message').that.equal('User registered successfully');
                 expect(res.body.data).to.have.property('user');
                 expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
-                expect (res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
+                expect(res.body.data.user.password).to.not.equal(userPassword); // Check if the password is hashed
                 done();
             });
     });
@@ -172,7 +172,7 @@ describe('UC-101 log in', () => {
                 expect(res.body.data).to.have.property('user');
                 expect(res.body.data).to.have.property('token').that.is.a('string');
                 expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
-                expect (res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
+                expect(res.body.data.user.password).to.not.equal(userPassword); // Check if the password is hashed
                 token = res.body.data.token; // Store the token for future requests
                 done();
             });
@@ -293,7 +293,7 @@ describe('UC-203 get user by profile', () => {
                 expect(res.body).to.have.property('message').that.equal('User profile retrieved successfully');
                 expect(res.body.data).to.have.property('user');
                 expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber', 'meals');	
-                expect(res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
+                expect(res.body.data.user.password).to.not.equal(userPassword); // Check if the password is hashed
                 done();
             });
     });
@@ -423,7 +423,7 @@ describe('UC-205 update user', () => {
                 expect(res.body).to.have.property('message').that.equal('User updated successfully');
                 expect(res.body.data).to.have.property('user');
                 expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
-                expect(res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
+                expect(res.body.data.user.password).to.not.equal(userPassword); // Check if the password is hashed
                 expect(res.body.data.user.street).to.equal('damstraat 1'); // Check if the street is updated
                 done();
             });

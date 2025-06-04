@@ -22,6 +22,7 @@ const userServices = {
                 city,
                 emailAdress,
                 phonenumber,
+                password,
                 isActive: 1 // Default value for isActive
               });
         });
