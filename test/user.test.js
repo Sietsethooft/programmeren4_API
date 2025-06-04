@@ -165,6 +165,7 @@ describe('UC-101 log in', () => {
             .post('/api/login')
             .send({ emailAdress: 'm.Johnes@test.com', password: 'ValidPassword1234' })
             .end((err, res) => {
+                userId = res.body.data.user.id; // Store the user ID for future requests
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equal('Login successful.');
@@ -287,7 +288,6 @@ describe('UC-203 get user by profile', () => {
             .get('/api/user/profile')
             .set('Authorization', `Bearer ${token}`) // Use the token for authentication
             .end((err, res) => {
-                userId = res.body.data.id; // Store the user ID for future requests
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equal('User profile retrieved successfully');
