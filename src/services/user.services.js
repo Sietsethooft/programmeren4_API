@@ -123,14 +123,22 @@ const userServices = {
         `;
         params.push(userId); // Add mealId to the end of the params array
 
+        params.push(userId);
+
         db.query(query, params, (error, results) => {
             if (error) return callback(error);
 
-            logger.info('User updated successfully:', { userId, ...userData });
-            return callback(null, {
-                id: userId,
-                ...userData // Only include the fields that were updated
-            });
+            // Haal de volledige gebruiker op na update
+            db.query(
+                `SELECT id, firstName, lastName, street, city, emailAdress, password, phonenumber, isActive FROM user WHERE id = ?`,
+                [userId],
+                (err, rows) => {
+                    if (err) return callback(err);
+                    if (!rows.length) return callback(new Error('User not found after update.'));
+                    logger.info('User updated successfully:', rows[0]);
+                    return callback(null, rows[0]);
+                }
+            );
         });
     },
 
