@@ -24,14 +24,14 @@ const userController = {
                 });
             }
 
-            // Hash het wachtwoord voordat de gebruiker wordt geregistreerd
+            // Hash the password before saving it
             bcrypt.hash(userData.password, 10, (err, hashedPassword) => {
                 if (error) return next(error);
 
-                // Vervang het wachtwoord door de gehashte versie
+                // Change the password in userData to the hashed password
                 userData.password = hashedPassword;
 
-                // Registreer de gebruiker
+                // Register the user
                 userService.registerUser(userData, (error, result) => {
                     if (error) return next(error);
 

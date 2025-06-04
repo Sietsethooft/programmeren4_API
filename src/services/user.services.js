@@ -129,7 +129,7 @@ const userServices = {
         db.query(query, params, (error, results) => {
             if (error) return callback(error);
 
-            // Haal de volledige gebruiker op na update
+            // Gets the full user data after the update
             db.query(
                 `SELECT id, firstName, lastName, street, city, emailAdress, password, phonenumber, isActive FROM user WHERE id = ?`,
                 [userId],
