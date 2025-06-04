@@ -94,28 +94,28 @@ describe('UC-201 register', () => {
     });
 
     // TC-201-5: User successfully registered
-    //     it('TC-201-5: should return 201 and user data on succesfull register', (done) => {
-    //      chai.request(app)
-    //         .post('/api/user')
-    //         .send({ 
-    //             firstName: 'Maria', 
-    //             lastName: 'Johnes', 
-    //             street: '123 Main St', 
-    //             city: 'Anytown', 
-    //             emailAdress: 'm.johnes@test.com',
-    //             password: 'ValidPassword1234',
-    //             phonenumber: '06-12345678'
-    //         })
-    //         .end((err, res) => {
-    //             expect(res).to.have.status(201);
-    //             expect(res.body).to.have.property('data');
-    //             expect(res.body).to.have.property('message').that.equal('User registered successfully');
-    //             expect(res.body.data).to.have.property('user');
-    //             expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
-    //             expect (res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
-    //             done();
-    //         });
-    // });
+        it('TC-201-5: should return 201 and user data on succesfull register', (done) => {
+         chai.request(app)
+            .post('/api/user')
+            .send({ 
+                firstName: 'Maria', 
+                lastName: 'Johnes', 
+                street: '123 Main St', 
+                city: 'Anytown', 
+                emailAdress: 'm.johnes@test.com',
+                password: 'ValidPassword1234',
+                phonenumber: '06-12345678'
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(201);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('User registered successfully');
+                expect(res.body.data).to.have.property('user');
+                expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
+                expect (res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
+                done();
+            });
+    });
 
 });
 
@@ -430,6 +430,55 @@ describe('UC-205 update user', () => {
     });
 });
 
-// describe('UC-206 delete user', () => {
+describe('UC-206 delete user', () => {
+    // TC-206-1: User not found
+    it('TC-206-1: should return 404 if user does not exist', (done) => {
+        chai.request(app)
+            .delete('/api/user/999949309') // invalid user ID
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User not found');
+                done();
+            });
+    });
 
-// });
+    // TC-206-2: User not authenticated
+    it('TC-206-2: should return 401 if user is not authenticated', (done) => {
+        chai.request(app)
+            .delete(`/api/user/${userId}`) // Use the stored userId from registration
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Access token is missing or invalid.');
+                done();
+            });
+    });
+
+    // TC-206-3: User is not the owner
+    it('TC-206-3: should return 403 if user is not the owner', (done) => {
+        chai.request(app)
+            .delete(`/api/user/${userIdOtherPerson}`) // Use the stored userId from another user
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(403);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User is not the owner of this account');
+                done();
+            });
+    });
+
+    //TC-206-4: User successfully deleted
+    it('TC-206-4: should return 200 and confirmation message on successful deletion', (done) => {
+        chai.request(app)
+            .delete(`/api/user/${userId}`) // Use the stored userId from registration
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal(`User with ID ${userId} is deleted`);
+                done();
+            });
+    });
+});
