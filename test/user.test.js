@@ -14,6 +14,7 @@ chai.use(chaiHttp);
 let token; // Variable to store the token for authenticated requests
 let userId; // Variable to store the user ID for id requests
 let userIdOtherPerson; // Variable to store another user's id for id requests
+let userPassword = 'ValidPassword1234'; // Variable to store the password to check if password is correct
 
 describe('UC-201 register', () => {
     // TC-201-1: Required field is missing
@@ -39,7 +40,7 @@ describe('UC-201 register', () => {
                 street: '123 Main St', 
                 city: 'Anytown', 
                 emailAdress: 'invalidemail', // invalid email
-                password: 'ValidPassword1',
+                password: userPassword,
                 phonenumber: '1234567890'
             })
             .end((err, res) => {
@@ -81,7 +82,7 @@ describe('UC-201 register', () => {
                 street: '123 Main St', 
                 city: 'Anytown', 
                 emailAdress: 'j.doe@server.com',
-                password: 'ValidPassword1234',
+                password: userPassword,
                 phonenumber: '06-12345678'
             })
             .end((err, res) => {
@@ -109,7 +110,9 @@ describe('UC-201 register', () => {
     //             expect(res).to.have.status(201);
     //             expect(res.body).to.have.property('data');
     //             expect(res.body).to.have.property('message').that.equal('User registered successfully');
-    //             expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
+    //             expect(res.body.data).to.have.property('user');
+    //             expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
+    //             expect (res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
     //             done();
     //         });
     // });
@@ -168,6 +171,7 @@ describe('UC-101 log in', () => {
                 expect(res.body.data).to.have.property('user');
                 expect(res.body.data).to.have.property('token').that.is.a('string');
                 expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
+                expect (res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
                 token = res.body.data.token; // Store the token for future requests
                 done();
             });
@@ -287,7 +291,9 @@ describe('UC-203 get user by profile', () => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equal('User profile retrieved successfully');
-                expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber', 'meals');	
+                expect(res.body.data).to.have.property('user');
+                expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber', 'meals');	
+                expect(res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
                 done();
             });
     });
@@ -328,7 +334,8 @@ describe('UC-204 get user by id', () => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equal('User retrieved successfully');
-                expect(res.body.data).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber', 'meals');
+                expect(res.body.data).to.have.property('user');
+                expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber', 'meals');
                 done();
             });
     });
@@ -414,7 +421,10 @@ describe('UC-205 update user', () => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equal('User updated successfully');
-                expect(res.body.data).to.include.keys('id','street','emailAdress');
+                expect(res.body.data).to.have.property('user');
+                expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
+                expect(res.body.data.user.password).to.equal(userPassword); // Check if the password is correct
+                expect(res.body.data.user.street).to.equal('damstraat 1'); // Check if the street is updated
                 done();
             });
     });
