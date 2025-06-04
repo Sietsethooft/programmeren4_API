@@ -40,7 +40,7 @@ const userController = {
                     res.status(201).json({
                         status: 201,
                         message: 'User registered successfully',
-                        data: { ...result, password: plainPassword }
+                        data: { user: { ...result, password: plainPassword }}
                     });
                 });
             });
@@ -65,10 +65,10 @@ const userController = {
         const userId = req.user.userId; // Get the userId from the token
         logger.info('User ID from token:', userId); // Log the userId for debugging
         
-        userService.getUserById(userId, (error, user) => {
+        userService.getUserById(userId, (error, result) => {
             if (error) return next(error);
 
-            if (!user) {
+            if (!result) {
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -79,7 +79,7 @@ const userController = {
             res.status(200).json({
                 status: 200,
                 message: 'User profile retrieved successfully',
-                data: user
+                data: {user: result}
             });
         });
     },
@@ -87,10 +87,10 @@ const userController = {
     getUserById: (req, res, next) => { // UC-204
         const userId = parseInt(req.params.userId, 10);
 
-        userService.getUserById(userId, (error, user) => {
+        userService.getUserById(userId, (error, result) => {
             if (error) return next(error);
 
-            if (!user) {
+            if (!result) {
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -101,7 +101,7 @@ const userController = {
             res.status(200).json({
                 status: 200,
                 message: 'User retrieved successfully',
-                data: user
+                data: {user: result}
             });
         });
     },
@@ -135,13 +135,14 @@ const userController = {
                 return handleValidationErrorUser(res, validationError);
             }
 
+
             userService.updateUser(userId, userData, (error, result) => {
                 if (error) return next(error);
     
                 res.status(200).json({
                     status: 200,
                     message: 'User updated successfully',
-                    data: result // No {} here, so the result is not wrapped in an object
+                    data: {user: result}
                 });
             });
 
