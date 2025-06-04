@@ -135,17 +135,34 @@ const userController = {
                 return handleValidationErrorUser(res, validationError);
             }
 
+            // Check if password is present, hash it if so
+            if (userData.password) {
+                bcrypt.hash(userData.password, 10, (err, hashedPassword) => {
+                    if (err) return next(err);
 
-            userService.updateUser(userId, userData, (error, result) => {
-                if (error) return next(error);
-    
-                res.status(200).json({
-                    status: 200,
-                    message: 'User updated successfully',
-                    data: {user: result}
+                    userData.password = hashedPassword;
+
+                    userService.updateUser(userId, userData, (error, result) => {
+                        if (error) return next(error);
+
+                        res.status(200).json({
+                            status: 200,
+                            message: 'User updated successfully',
+                            data: {user: result}
+                        });
+                    });
                 });
-            });
+            } else {
+                userService.updateUser(userId, userData, (error, result) => {
+                    if (error) return next(error);
 
+                    res.status(200).json({
+                        status: 200,
+                        message: 'User updated successfully',
+                        data: {user: result}
+                    });
+                });
+            }
         });
     },
 
