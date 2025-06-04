@@ -44,6 +44,72 @@ before((done) => {
     });
 });
 
+describe('UC-301 Create Meal', () => {
+    // TC-301-1 Required fields are missing
+    it('TC-301-1 Required fields are missing', (done) => {
+        chai.request(app)
+            .post('/api/meal')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: "Spaghetti Bolognese",
+                description: "Klassieke Italiaanse pasta met rijke tomatensaus en gehakt.",
+                dateTime: "2026-05-10T18:00:00Z",
+                maxAmountOfParticipants: 5,
+                imageUrl: "https://spaghettifoto.com"
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.contains('required');
+                done();
+            });
+    });
+
+    // TC-301-2 Not authenticated
+    it('TC-301-2 Not authenticated', (done) => {
+        chai.request(app)
+            .post('/api/meal')
+            .send({
+                name: "Spaghetti Bolognese",
+                description: "Klassieke Italiaanse pasta met rijke tomatensaus en gehakt.",
+                dateTime: "2026-05-10T18:00:00Z",
+                price: 12.50,
+                maxAmountOfParticipants: 5,
+                imageUrl: "https://spaghettifoto.com"
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Access token is missing or invalid.');
+                done();
+            });
+    });
+
+    // TC-301-3 Meal succesfully created
+    it('TC-301-1 Required fields are missing', (done) => {
+        chai.request(app)
+            .post('/api/meal')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: "Spaghetti Bolognese",
+                description: "Klassieke Italiaanse pasta met rijke tomatensaus en gehakt.",
+                dateTime: "2026-05-10T18:00:00Z",
+                price: 12.50,
+                maxAmountOfParticipants: 5,
+                imageUrl: "https://spaghettifoto.com"
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(201);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.contains('Meal created successfully');
+                expect(res.body.data).to.have.property('meal');
+                expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
+                done();
+            });
+    });
+});
+
+
 after((done) => {
     if (userId && token) {
         chai.request(app)
