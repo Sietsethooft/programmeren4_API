@@ -136,6 +136,7 @@ describe('UC-301 Create Meal', () => {
                 expect(res.body).to.have.property('message').that.contains('Meal created successfully');
                 expect(res.body.data).to.have.property('meal');
                 expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
+                expect(res.body.data.meal.cook).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phoneNumber');
                 done();
             });
     });
@@ -234,11 +235,29 @@ describe('UC-302 Update Meal', () => {
                 expect(res.body.data).to.have.property('meal');
                 expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
                 expect(res.body.data.meal.imageUrl).to.equal("https://spaghettifoto2.com");
+                expect(res.body.data.meal.cook).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phoneNumber');
                 done();
             });
     });
 });
 
+describe('UC-303 Get All Meals', () => {
+    // TC-303-1 Retrieve all meals successfully
+    it('TC-303-1 Should return 200 and all meals', (done) => {
+        chai.request(app)
+            .get('/api/meal')
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equals('Meals retrieved successfully');
+                expect(res.body.data).to.have.property('meals');
+                expect(res.body.data.meals).to.be.an('array').that.is.not.empty;
+                expect(res.body.data.meals[0]).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
+                expect(res.body.data.meals[0].cook).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phoneNumber');
+                done();
+            });
+    });
+});
 
 after((done) => { // After all tests, delete the user
     if (userId && token) {
