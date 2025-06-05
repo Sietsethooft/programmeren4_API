@@ -67,6 +67,7 @@ const userController = {
             if (error) return next(error);
 
             if (!result) {
+                logger.info(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -89,6 +90,7 @@ const userController = {
             if (error) return next(error);
 
             if (!result) {
+                logger.info(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -113,6 +115,7 @@ const userController = {
             if (error) return next(error);
 
             if (!user) {
+                logger.info(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -172,6 +175,7 @@ const userController = {
             if (error) return next(error);
 
             if (!user) {
+                logger.info(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',

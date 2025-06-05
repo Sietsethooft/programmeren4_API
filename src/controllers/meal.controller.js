@@ -45,6 +45,7 @@ const mealController = {
             if (error) return next(error); // This sends the error to the error handler in util.
 
             if (!cookId) {
+                logger.info(`Meal with ID ${mealId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'Meal not found',
@@ -88,11 +89,12 @@ const mealController = {
     getMealById: (req, res, next) => { // UC-304
         const mealId = parseInt(req.params.mealId, 10);
 
-        mealService.getMealById(mealId, (error, result) => {
+        mealService.getMealById(mealId, (error, results) => {
             if (error) return next(error); // This sends the error to the error handler in util.
 
-            meal = result[0]; // Get the first meal from the result
-            if (!meal) {
+            result = results[0]; // Get the first meal from the result
+            if (!result) {
+                logger.info(`Meal with ID ${mealId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'Meal not found',
@@ -103,7 +105,7 @@ const mealController = {
             res.status(200).json({
                 status: 200,
                 message: 'Meal retrieved successfully',
-                data: meal
+                data: {meal: result}
             });
         });
     },
@@ -116,6 +118,7 @@ const mealController = {
             if (error) return next(error); // This sends the error to the error handler in util.
 
             if (!cookId) {
+                logger.info(`Meal with ID ${mealId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'Meal not found',

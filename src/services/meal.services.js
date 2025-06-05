@@ -214,7 +214,10 @@ const mealService = {
             });
 
             const meals = Array.from(mealsMap.values());
-            logger.info('Meal retrieved successfully:', 'id=' + meals.id);
+            if (!meals.length === 0) {
+                logger.info('Meal retrieved successfully:', 'id=' + (meals[0]?.id));
+            }
+            
             callback(null, meals);
         });
         
