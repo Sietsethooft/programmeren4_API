@@ -13,7 +13,7 @@ const userServices = {
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber], (error, results) => {
             if (error) return callback(error);            
     
-            logger.info('User registered successfully:', results.insertId);
+            logger.info('User registered successfully:', 'userId: ' + results.insertId);
             return callback(null, { // Return the inserted user data with the generated ID
                 id: results.insertId,
                 firstName,
@@ -38,7 +38,7 @@ const userServices = {
                 return callback(null, null); // No user found with the given email address
             }
     
-            logger.info('User found:', results[0]);
+            logger.info('User found with that email:', 'id=' + results[0].id);
             return callback(null, results[0]); // Return the found user
         });
     },
@@ -73,7 +73,7 @@ const userServices = {
         db.query(query, values, (error, results) => {
             if (error) return callback(error);
             
-            logger.info('All users retrieved successfully:', results);
+            logger.info('All users retrieved successfully:', results.length + ' users found');
             return callback(null, results);
         });
     },
@@ -96,7 +96,7 @@ const userServices = {
             // Split the meals string into an array, or return an empty array if no meals exist
             user.meals = user.meals ? user.meals.split('; ') : [];
     
-            logger.info('User found:', user);
+            logger.info('User found:', 'id=' + user.id);
             return callback(null, user); // Return the modified user object
         });
     },

@@ -213,7 +213,7 @@ const mealService = {
             });
 
             const meals = Array.from(mealsMap.values());
-            logger.info('Meal retrieved successfully:', meals);
+            logger.info('Meal retrieved successfully:', meals.id);
             callback(null, meals);
         });
         
@@ -274,8 +274,6 @@ const mealService = {
             WHERE id = ?
         `;
         params.push(mealId);
-
-        logger.info('Executing query:', query, params);
 
         db.query(query, params, (error, result) => {
             if (error) return callback(error);

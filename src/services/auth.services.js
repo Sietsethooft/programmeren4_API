@@ -8,7 +8,7 @@ const authServices = {
         db.query(query, [emailAdress], (error, result) => {
             if (error) return callback(error);
 
-            logger.trace(result);
+            logger.info("User login attempt for email:", emailAdress);
             callback(null, result);
         });
     }
