@@ -288,6 +288,59 @@ describe('UC-304 Get Meal by ID', () => {
     });
 });
 
+describe('UC-305 Delete Meal', () => {
+    // TC-305-1 Not authenticated
+    it('TC-305-1 Should return 401 if not authenticated', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}`)
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Access token is missing or invalid.');
+                done();
+            });
+    });
+
+    // TC-305-2 Not the owner of the meal
+    it('TC-305-2 Should return 403 if not the owner of the meal', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}`)
+            .set('Authorization', `Bearer ${otherToken}`)
+            .end((err, res) => {
+                expect(res).to.have.status(403);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('User is not the owner of this meal');
+                done();
+            });
+    });
+
+    // TC-305-3 Meal not found
+    it('TC-305-3 Should return 404 if meal not found', (done) => {
+        chai.request(app)
+            .delete('/api/meal/999999')
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Meal not found');
+                done();
+            });
+    });
+
+    // TC-305-4 Meal successfully deleted
+    it('TC-305-4 Should return 200 if meal successfully deleted', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals(`Meal with ID ${mealId} deleted successfully`);
+                done();
+            });
+    });
+});
+
 after((done) => { // After all tests, delete the user
     if (userId && token) {
         chai.request(app)
