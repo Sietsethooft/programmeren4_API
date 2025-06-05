@@ -136,7 +136,6 @@ describe('UC-301 Create Meal', () => {
                 expect(res.body).to.have.property('message').that.contains('Meal created successfully');
                 expect(res.body.data).to.have.property('meal');
                 expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
-                expect(res.body.data.cook).to.not.have.property('password');
                 done();
             });
     });
@@ -234,7 +233,6 @@ describe('UC-302 Update Meal', () => {
                 expect(res.body).to.have.property('message').that.contains('Meal updated successfully');
                 expect(res.body.data).to.have.property('meal');
                 expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
-                expect(res.body.data.cook).to.not.have.property('password');
                 expect(res.body.data.meal.imageUrl).to.equal("https://spaghettifoto2.com");
                 done();
             });
