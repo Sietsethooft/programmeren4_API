@@ -70,8 +70,7 @@ jobs:
 
       - name: Import the database
         run: |
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} \`${{env.DB_NAME}}\` < src/database/sql-files/share-a-meal.sql
-          mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}} \`${{env.DB_NAME}}\` -e "SHOW TABLES;"
+          echo "USE \`${{env.DB_NAME}}\`;" | cat - src/database/sql-files/share-a-meal.sql | mysql -uroot -p${{env.MYSQL_ROOT_PASSWORD}}
 
       - name: npm test
         run: |
