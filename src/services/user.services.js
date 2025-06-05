@@ -13,7 +13,7 @@ const userServices = {
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber], (error, results) => {
             if (error) return callback(error);            
     
-            logger.info('User registered successfully:', 'userId: ' + results.insertId);
+            logger.info('User registered successfully:', results);
             return callback(null, { // Return the inserted user data with the generated ID
                 id: results.insertId,
                 firstName,

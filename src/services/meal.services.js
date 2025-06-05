@@ -23,7 +23,7 @@ const mealService = {
 
         db.query(query, params, (error, result) => {
             if (error) return callback(error);
-
+            logger.info('Meal created successfully:', result);
             const mealId = result.insertId;
 
             mealService.getMealById(mealId, (error, meals) => { // Gets all details of the meal including cook and participants
@@ -121,6 +121,7 @@ const mealService = {
             });
 
             const meals = Array.from(mealsMap.values());
+            logger.info('All meals retrieved successfully:', meals.length + ' meals found');
             callback(null, meals);
         });
     },
@@ -213,7 +214,7 @@ const mealService = {
             });
 
             const meals = Array.from(mealsMap.values());
-            logger.info('Meal retrieved successfully:', meals.id);
+            logger.info('Meal retrieved successfully:', 'id=' + meals.id);
             callback(null, meals);
         });
         
