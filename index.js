@@ -13,22 +13,20 @@ const app = express();
 app.use(bodyParser.json());
 
 
-app.get('/', (req, res) => {
+app.get('/info', (req, res) => {
     res.json({
         status: 200,
-        message: 'Welcome to the API of Share-A-Meal!',
+        message: 'Welcome to my Share-A-Meal API!',
         data: {
-            name: 'Share-A-Meal API',
-            version: '1.0.0',
-            description: 'This is the API for Share-A-Meal, a platform for sharing meals.',
+            studentName: 'Sietse t Hooft',
+            studentNumber: '2213722',
+            description: 'Dit is een zelfgemaakte API voor de Share-A-Meal opdracht.' +
+            ' Deze API maakt gebruik van javascript & mysql.' +
+            ' Voor de authenticatie wordt gebruik gemaakt van JWT tokens en bycrypt voor het hashen van wachtwoorden.' +
+            ' Ook bevat deze API meerdere testen die zijn geschreven met Mocha en Chai.'
         }
     });
 });
-
-app.get('/test-error', (req, res, next) => {
-    next({ status: 400, message: 'Test error' });
-});
-
 
 // Route connection
 app.use('/api', authRoutes);
