@@ -60,14 +60,15 @@ const userController = {
     },
 
     getUserProfile: (req, res, next) => { // UC-203
+        const loggedInUserId = req.user.userId; // Get the userId from the token
         const userId = req.user.userId; // Get the userId from the token
         logger.info('User ID from token:', userId); // Log the userId for debugging
         
-        userService.getUserById(userId, (error, result) => {
+        userService.getUserById(userId,loggedInUserId, (error, result) => {
             if (error) return next(error);
 
             if (!result) {
-                logger.info(`User with ID ${userId} not found`);
+                logger.warn(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -85,12 +86,13 @@ const userController = {
 
     getUserById: (req, res, next) => { // UC-204
         const userId = parseInt(req.params.userId, 10);
+        const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        userService.getUserById(userId, (error, result) => {
+        userService.getUserById(userId, loggedInUserId, (error, result) => {
             if (error) return next(error);
 
             if (!result) {
-                logger.info(`User with ID ${userId} not found`);
+                logger.warn(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -111,11 +113,11 @@ const userController = {
         const userData = req.body;
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        userService.getUserById(userId, (error, user) => {
+        userService.getUserById(userId, loggedInUserId, (error, user) => {
             if (error) return next(error);
 
             if (!user) {
-                logger.info(`User with ID ${userId} not found`);
+                logger.warn(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -171,11 +173,11 @@ const userController = {
         const userId = parseInt(req.params.userId, 10);
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        userService.getUserById(userId, (error, user) => {
+        userService.getUserById(userId, loggedInUserId, (error, user) => {
             if (error) return next(error);
 
             if (!user) {
-                logger.info(`User with ID ${userId} not found`);
+                logger.warn(`User with ID ${userId} not found`);
                 return res.status(404).json({
                     status: 404,
                     message: 'User not found',
@@ -184,7 +186,7 @@ const userController = {
             }
 
             if (loggedInUserId !== userId) {
-                return next({
+                return res.status(403).json({
                     status: 403,
                     message: "User is not the owner of this account",
                     data: {}
