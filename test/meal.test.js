@@ -136,6 +136,7 @@ describe('UC-301 Create Meal', () => {
                 expect(res.body).to.have.property('message').that.contains('Meal created successfully');
                 expect(res.body.data).to.have.property('meal');
                 expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
+                expect(res.body.data.cook).to.not.have.property('password');
                 done();
             });
     });
@@ -178,7 +179,7 @@ describe('UC-302 Update Meal', () => {
             });
     });
 
-    // TC-303-3 Not the owner of the meal
+    // TC-302-3 Not the owner of the meal
     it('TC-302-3 Should return 403 if not the owner of the meal', (done) => {
         chai.request(app)
             .put(`/api/meal/${mealId}`)
@@ -197,7 +198,7 @@ describe('UC-302 Update Meal', () => {
             });
     });
 
-    // TC-303-4 Meal not found
+    // TC-302-4 Meal not found
     it('TC-302-4 Should return 404 if meal not found', (done) => {
         chai.request(app)
             .put('/api/meal/999999')
@@ -216,7 +217,7 @@ describe('UC-302 Update Meal', () => {
             });
     });
 
-    // TC-303-5 Meal successfully updated
+    // TC-302-5 Meal successfully updated
     it('TC-302-5 Should return 200 if meal successfully updated', (done) => {
         chai.request(app)
             .put(`/api/meal/${mealId}`)
@@ -233,6 +234,7 @@ describe('UC-302 Update Meal', () => {
                 expect(res.body).to.have.property('message').that.contains('Meal updated successfully');
                 expect(res.body.data).to.have.property('meal');
                 expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
+                expect(res.body.data.cook).to.not.have.property('password');
                 expect(res.body.data.meal.imageUrl).to.equal("https://spaghettifoto2.com");
                 done();
             });
