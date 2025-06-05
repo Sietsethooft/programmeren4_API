@@ -78,13 +78,15 @@ const userServices = {
         });
     },
 
-    getUserById: (userId, callback) => {
+    getUserById: (userId, loggedInUserId, callback) => {
+        const selectPassword = userId == loggedInUserId ? ', password' : '';
         const query = `
-            SELECT user.id, firstName, lastName, emailAdress, phonenumber, street, city, user.isActive, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
+            SELECT user.id, firstName, lastName, emailAdress${selectPassword}, phonenumber, street, city, user.isActive, GROUP_CONCAT(meal.name SEPARATOR '; ') AS meals
             FROM user
             LEFT JOIN meal ON meal.cookId = user.id AND meal.dateTime >= NOW()
             WHERE user.id = ?
-            GROUP BY user.id;`; // SEPARATOR makes sure that the meals can be split.
+            GROUP BY user.id;
+        `;
     
         db.query(query, [userId], (error, result) => {
             if (error) return callback(error);
