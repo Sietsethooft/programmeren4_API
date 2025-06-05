@@ -255,9 +255,8 @@ const mealService = {
         allowedFields.forEach((field) => {
             if (mealData[field] !== undefined) {
                 if (field === 'allergenes' && Array.isArray(mealData[field])) {
-                    // Set the allergenes field as a comma-separated string
                     updates.push(`${field} = ?`);
-                    params.push(mealData[field].join(',')); // Convert array to comma-separated string
+                    params.push(mealData[field].join(','));
                 } else {
                     updates.push(`${field} = ?`);
                     params.push(mealData[field]);
@@ -265,7 +264,7 @@ const mealService = {
             }
         });
 
-        if (updates.length === 0) { // For emergency
+        if (updates.length === 0) {
             return callback(new Error('No valid fields provided to update.'));
         }
 
@@ -274,23 +273,22 @@ const mealService = {
             SET ${updates.join(', ')}
             WHERE id = ?
         `;
-        params.push(mealId); // Add mealId to the end of the params array
+        params.push(mealId);
 
         logger.info('Executing query:', query, params);
 
         db.query(query, params, (error, result) => {
             if (error) return callback(error);
 
-            const updatedMeal = {
-                id: mealId,
-                ...mealData, // Only include the fields that were updated
-            };
+            // Gets all the details of the updated meal including cook and participants
+            mealService.getMealById(mealId, (error, meals) => {
+                if (error) return callback(error);
 
-            logger.info('Meal updated successfully:', updatedMeal);
-
-            callback(null, updatedMeal);
+                logger.info('Meal updated successfully:', meals[0]);
+                callback(null, meals[0]);
+            });
         });
-    },
+    }
 }
 
 module.exports = mealService;

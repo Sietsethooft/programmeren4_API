@@ -66,7 +66,7 @@ const mealController = {
                 res.status(200).json({
                     status: 200,
                     message: 'Meal updated successfully',
-                    data: result
+                    data: {meal: result}
                 });
             });
 
