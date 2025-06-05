@@ -22,7 +22,7 @@ const mealController = {
             res.status(201).json({
                 status: 201,
                 message: 'Meal created successfully',
-                data: result
+                data: {meal: result}
             });
         });
     },

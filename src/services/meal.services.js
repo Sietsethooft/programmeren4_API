@@ -3,21 +3,34 @@ const db = require('../database/DBconfig');
 
 const mealService = {
     createMeal: (mealData, loggedInUserId, callback) => { // UC-301
-        const { name, description, price, dateTime, maxAmountOfParticipants, imageUrl } = mealData;
+        const { name, description, price, dateTime, maxAmountOfParticipants, imageUrl, isActive, isVega, isVegan, isToTakeHome, allergenes } = mealData;
 
-        const query = `INSERT INTO meal (name, description, price, dateTime, maxAmountOfParticipants, imageUrl, cookId) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-        const params = [name, description, price, dateTime, maxAmountOfParticipants, imageUrl, loggedInUserId];
+        const query = `INSERT INTO meal (name, description, price, dateTime, maxAmountOfParticipants, imageUrl, cookId, isActive, isVega, isVegan, isToTakeHome, allergenes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const params = [
+            name,
+            description,
+            price,
+            dateTime,
+            maxAmountOfParticipants,
+            imageUrl,
+            loggedInUserId,
+            isActive ?? 1, // Default to active if not provided
+            isVega ?? 0,
+            isVegan ?? 0,
+            isToTakeHome ?? 0,
+            Array.isArray(allergenes) ? allergenes.join(',') : (allergenes || '')
+        ];
 
         db.query(query, params, (error, result) => {
             if (error) return callback(error);
 
-            const createdMeal = {
-                id: result.insertId,
-                ...mealData,
-                cookId: loggedInUserId,
-            };
+            const mealId = result.insertId;
 
-            callback(null, createdMeal);
+            mealService.getMealById(mealId, (error, meals) => { // Gets all details of the meal including cook and participants
+                if (error) return callback(error);
+
+                callback(null, meals[0]); // If meal is an array, return the first element (For emergency)
+            });
         });
     },
 
