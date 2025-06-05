@@ -259,6 +259,35 @@ describe('UC-303 Get All Meals', () => {
     });
 });
 
+describe('UC-304 Get Meal by ID', () => {
+    // TC-304-1 Meal not found
+    it('TC-304-1 Should return 404 if meal not found', (done) => {
+        chai.request(app)
+            .get('/api/meal/999999')
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Meal not found');
+                done();
+            });
+    });
+
+    // TC-304-2 Meal successfully found
+    it('TC-304-2 Should return 200 if meal successfully found', (done) => {
+        chai.request(app)
+            .get(`/api/meal/${mealId}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equals('Meal retrieved successfully');
+                expect(res.body.data).to.have.property('meal');
+                expect(res.body.data.meal).to.include.keys('id', 'name', 'description', 'dateTime', 'isActive', 'isVega', 'isVegan', 'isToTakeHome', 'price', 'maxAmountOfParticipants', 'imageUrl', 'allergenes', 'cook', 'participants');
+                expect(res.body.data.meal.cook).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phoneNumber');
+                done();
+            });
+    });
+});
+
 after((done) => { // After all tests, delete the user
     if (userId && token) {
         chai.request(app)
