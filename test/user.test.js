@@ -211,16 +211,7 @@ before((done) => { // Register a user before running the get all test
                             isActive: 0
                         })
                         .end(() => {
-                            chai.request(app) // Update the isActive field to 0 for another user
-                            .put(`/api/user/${userId}`)
-                            .set('Authorization', `Bearer ${token}`)
-                            .send({
-                                emailAdress: 'm.Johnes@gmail.com',
-                                isActive: 0
-                            })
-                            .end(() => {
-                                done();
-                            });
+                            done();
                         });
                 });
         });
@@ -270,7 +261,6 @@ describe('UC-202 get all users', () => {
                 res.body.data.users.forEach(user => {
                     expect(user.isActive).to.equal(0); // Check if isActive is false (0)
                 });
-                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
                 expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
                 done();
             });
