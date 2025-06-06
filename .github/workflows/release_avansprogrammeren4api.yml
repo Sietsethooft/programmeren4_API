@@ -105,6 +105,39 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C00F59559A104361A0C3BBBD253C6D6C }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_30EC4017DF47405FABB4AA807EF1BDF5 }}
 
+      - name: Set Azure Web App settings from secrets
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: avansprogrammeren4API
+          app-settings-json: |
+            [
+              {
+                "name": "DB_HOST",
+                "value": "${{ secrets.DB_HOST }}",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_USER",
+                "value": "${{ secrets.DB_USER }}",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_PASSWORD",
+                "value": "${{ secrets.DB_PASSWORD }}",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_NAME",
+                "value": "${{ secrets.DB_NAME }}",
+                "slotSetting": false
+              },
+              {
+                "name": "DB_PORT",
+                "value": "${{ secrets.DB_PORT }}",
+                "slotSetting": false
+              }
+            ]
+
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
