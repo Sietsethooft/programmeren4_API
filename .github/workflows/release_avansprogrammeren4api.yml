@@ -135,6 +135,11 @@ jobs:
                 "name": "DB_PORT",
                 "value": "${{ secrets.DB_PORT }}",
                 "slotSetting": false
+              },
+              {
+                "name": "JWT_SECRET",
+                "value": "${{ secrets.JWT_SECRET }}",
+                "slotSetting": false
               }
             ]
 
