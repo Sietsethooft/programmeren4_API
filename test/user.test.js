@@ -37,11 +37,11 @@ describe('UC-201 register', () => {
             .send({ 
                 firstName: 'Maria', 
                 lastName: 'Johnes', 
-                street: '123 Main St', 
-                city: 'Anytown', 
+                street: 'Damstraat 1', 
+                city: 'Amsterdam', 
                 emailAdress: 'invalidemail', // invalid email
                 password: userPassword,
-                phonenumber: '1234567890'
+                phonenumber: '06-12345678'
             })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -58,9 +58,9 @@ describe('UC-201 register', () => {
             .send({ 
                 firstName: 'Maria', 
                 lastName: 'Johnes', 
-                street: '123 Main St', 
-                city: 'Anytown', 
-                emailAdress: 'm.johnes@test.com',
+                street: 'Damstraat 1', 
+                city: 'Amsterdam', 
+                emailAdress: 'm.johnes@gmail.com',
                 password: 'notvalid', // invalid password
                 phonenumber: '06-12345678'
             })
@@ -79,8 +79,8 @@ describe('UC-201 register', () => {
             .send({ 
                 firstName: 'Maria', 
                 lastName: 'Johnes', 
-                street: '123 Main St', 
-                city: 'Anytown', 
+                street: 'Damstraat 1', 
+                city: 'Amsterdam', 
                 emailAdress: 'j.doe@server.com',
                 password: userPassword,
                 phonenumber: '06-12345678'
@@ -100,10 +100,10 @@ describe('UC-201 register', () => {
             .send({ 
                 firstName: 'Maria', 
                 lastName: 'Johnes', 
-                street: '123 Main St', 
-                city: 'Anytown', 
-                emailAdress: 'm.johnes@test.com',
-                password: 'ValidPassword1234',
+                street: 'Damstraat 1', 
+                city: 'Amsterdam', 
+                emailAdress: 'm.johnes@gmail.com',
+                password: userPassword,
                 phonenumber: '06-12345678'
             })
             .end((err, res) => {
@@ -137,7 +137,7 @@ describe('UC-101 log in', () => {
     it('TC-101-2: should return 400 if password is invalid', (done) => {
         chai.request(app)
             .post('/api/login')
-            .send({ emailAdress: 'm.Johnes@test.com', password: 'wrongpassword' })
+            .send({ emailAdress: 'm.Johnes@gmail.com', password: 'wrongpassword' })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
@@ -163,7 +163,7 @@ describe('UC-101 log in', () => {
     it('TC-101-4: should return 200 and user data with token on successful login', (done) => {
         chai.request(app)
             .post('/api/login')
-            .send({ emailAdress: 'm.Johnes@test.com', password: 'ValidPassword1234' })
+            .send({ emailAdress: 'm.Johnes@gmail.com', password: 'ValidPassword1234' })
             .end((err, res) => {
                 userId = res.body.data.user.id; // Store the user ID for future requests
                 expect(res).to.have.status(200);
@@ -177,6 +177,44 @@ describe('UC-101 log in', () => {
                 done();
             });
     });
+});
+
+let tempUserId, tempToken; // Temporary variables to store user ID and token for the get all users test
+
+before((done) => { // Register a user before running the get all test
+    chai.request(app)
+        .post('/api/user')
+        .send({ 
+            firstName: 'Maria', 
+            lastName: 'Josheff', 
+            street: 'Damstraat 6', 
+            city: 'Amsterdam', 
+            emailAdress: 'm.josheff@gmail.com',
+            password: userPassword,
+            phonenumber: '06-12345678'
+        })
+        .end((err, res) => {
+            chai.request(app) // Get the token
+                .post('/api/login')
+                .send({
+                    emailAdress: 'm.josheff@gmail.com',
+                    password: userPassword
+                })
+                .end((err, res) => {
+                    tempToken = res.body.data.token;
+                    tempUserId = res.body.data.user.id;
+                    chai.request(app) // Update the isActive field to 0 for the user
+                        .put(`/api/user/${tempUserId}`)
+                        .set('Authorization', `Bearer ${tempToken}`)
+                        .send({
+                            emailAdress: 'm.josheff@gmail.com',
+                            isActive: 0
+                        })
+                        .end(() => {
+                            done();
+                        });
+                });
+        });
 });
 
 describe('UC-202 get all users', () => {
@@ -481,4 +519,17 @@ describe('UC-206 delete user', () => {
                 done();
             });
     });
+});
+
+after((done) => {
+    if (tempUserId && tempToken) {
+        chai.request(app)
+            .delete(`/api/user/${tempUserId}`)
+            .set('Authorization', `Bearer ${tempToken}`)
+            .end(() => {
+                done();
+            });
+    } else {
+        done();
+    }
 });
