@@ -211,7 +211,16 @@ before((done) => { // Register a user before running the get all test
                             isActive: 0
                         })
                         .end(() => {
-                            done();
+                            chai.request(app) // Update the isActive field to 0 for another user
+                            .put(`/api/user/${userId}`)
+                            .set('Authorization', `Bearer ${token}`)
+                            .send({
+                                emailAdress: 'm.Johnes@gmail.com',
+                                isActive: 0
+                            })
+                            .end(() => {
+                                done();
+                            });
                         });
                 });
         });
