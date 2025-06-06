@@ -84,7 +84,7 @@ describe('UC-301 Create Meal', () => {
             .send({
                 name: "Spaghetti Bolognese",
                 description: "Klassieke Italiaanse pasta met rijke tomatensaus en gehakt.",
-                dateTime: "2026-05-10T18:00:00Z",
+                dateTime: "2026-05-10 18:00:00",
                 maxAmountOfParticipants: 5,
                 imageUrl: "https://spaghettifoto.com"
             })
@@ -103,7 +103,7 @@ describe('UC-301 Create Meal', () => {
             .send({
                 name: "Spaghetti Bolognese",
                 description: "Klassieke Italiaanse pasta met rijke tomatensaus en gehakt.",
-                dateTime: "2026-05-10T18:00:00Z",
+                dateTime: "2026-05-10 18:00:00",
                 price: 12.50,
                 maxAmountOfParticipants: 5,
                 imageUrl: "https://spaghettifoto.com"
@@ -124,7 +124,7 @@ describe('UC-301 Create Meal', () => {
             .send({
                 name: "Spaghetti Bolognese",
                 description: "Klassieke Italiaanse pasta met rijke tomatensaus en gehakt.",
-                dateTime: "2026-05-10T18:00:00Z",
+                dateTime: "2026-05-10 18:00:00",
                 price: 12.50,
                 maxAmountOfParticipants: 5,
                 imageUrl: "https://spaghettifoto.com"

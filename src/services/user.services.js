@@ -12,19 +12,21 @@ const userServices = {
     
         db.query(query, [firstName, lastName, street, city, emailAdress, password, phonenumber], (error, results) => {
             if (error) return callback(error);            
-    
-            logger.info('User registered successfully:', results);
-            return callback(null, { // Return the inserted user data with the generated ID
+
+            const responseBody = {
                 id: results.insertId,
                 firstName,
                 lastName,
                 street,
+                password,
                 city,
                 emailAdress,
                 phonenumber,
-                password,
                 isActive: 1 // Default value for isActive
-              });
+            }
+    
+            logger.info('User registered successfully:', responseBody);
+            return callback(null, responseBody);  // Return the inserted user data with the generated ID
         });
     },
 
