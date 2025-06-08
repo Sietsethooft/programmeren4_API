@@ -18,6 +18,10 @@ const participantController = {
                     data: {}
                 });
             }
+
+            if (!Array.isArray(meal.participants)) { // Ensure participants is an array
+                meal.participants = [];
+            }
              
             if (meal.participants.length >= meal.maxParticipants) { // Check if the meal has reached the maximum number of participants
                 logger.warn(`Meal with ID #${mealId} has reached the maximum number of participants`);
