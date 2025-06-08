@@ -11,6 +11,28 @@ const participantService = {
             }
             callback(null, { mealId, userId: loggedInUserId });
         });
+    },
+
+    checkParticipant: (mealId, loggedInUserId, callback) => {
+        const query = 'SELECT * FROM meal_participants_user WHERE mealId = ? AND userId = ?';
+        db.query(query, [mealId, loggedInUserId], (error, results) => {
+            if (error) {
+                logger.error(`Error checking participant: ${error.message}`);
+                return callback(error);
+            }
+            callback(null, results); // Participant does not exist
+        });
+    },
+
+    deleteParticipant: (mealId, loggedInUserId, callback) => {
+        const query = 'DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?';
+        db.query(query, [mealId, loggedInUserId], (error, results) => {
+            if (error) {
+                logger.error(`Error deleting participant: ${error.message}`);
+                return callback(error);
+            }
+            callback(null, { mealId, userId: loggedInUserId });
+        });
     }
 }
 
