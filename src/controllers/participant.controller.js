@@ -7,10 +7,10 @@ const participantController = {
         const mealId = parseInt(req.params.mealId, 10);
         const loggedInUserId = req.user.userId; // Get the userId from the token
 
-        mealService.getMealById(mealId, (error, meal) => {
+        mealService.getMealById(mealId, (error, meals) => {
             if (error) return next(error); // This sends the error to the error handler in util.
 
-            if (!meal) { // Check if the meal exists
+            if (!meals || meals.length === 0) { // Check if the meal exists
                 logger.warn(`Meal with ID #${mealId} not found`);
                 return res.status(404).json({
                     status: 404,
