@@ -6,4 +6,6 @@ const participantRoutes = express.Router();
 
 participantRoutes.post('/:mealId/participate', authMiddleware.authenticateToken, participantController.createParticipant);
 
+participantRoutes.delete('/:mealId/participate', authMiddleware.authenticateToken, participantController.deleteParticipant);
+
 module.exports = participantRoutes;
