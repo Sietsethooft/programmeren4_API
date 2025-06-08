@@ -9,7 +9,7 @@ const participantService = {
                 logger.error(`Error creating participant: ${error.message}`);
                 return callback(error);
             }
-            callback(null, results.mealId, results.userId);
+            callback(null, { mealId, userId: loggedInUserId });
         });
     }
 }
