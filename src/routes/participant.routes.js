@@ -4,6 +4,6 @@ const authMiddleware = require('../middleware/auth.middleware');
 
 const participantRoutes = express.Router();
 
-participantRoutes.post('/participate', authMiddleware.authenticateToken, participantController.createParticipant);
+participantRoutes.post('/:mealId/participate', authMiddleware.authenticateToken, participantController.createParticipant);
 
 module.exports = participantRoutes;

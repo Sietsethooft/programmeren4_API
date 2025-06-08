@@ -33,7 +33,7 @@ app.get('/info', (req, res) => {
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', mealRoutes);
-app.use('/api/meal/:mealId', participantRoutes)
+app.use('/api/meal', participantRoutes)
 
 app.use(errorHandler);
 
