@@ -264,6 +264,18 @@ describe('UC-403: Get Participants', () => {
     });
 });
 
+describe('UC-404: Get Participant by ID', () => {
+    // TC-404-1: Not authenticated
+
+    // TC-404-2: Meal not found
+
+    // TC-404-3: Not the owner of the meal
+
+    // TC-404-4: Participant not found
+
+    // TC-404-5: Successfully fetched participant
+});
+
 after((done) => {
     // Clean up: Delete the created meal first, then the user
     chai.request(app)
