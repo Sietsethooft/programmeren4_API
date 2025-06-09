@@ -9,5 +9,6 @@ participantRoutes.post('/:mealId/participate', authMiddleware.authenticateToken,
 participantRoutes.delete('/:mealId/participate', authMiddleware.authenticateToken, participantController.deleteParticipant);
 
 participantRoutes.get('/:mealId/participants', authMiddleware.authenticateToken, participantController.getParticipants);
+participantRoutes.get('/:mealId/participants/:participantId', authMiddleware.authenticateToken, participantController.getParticipantById);
 
 module.exports = participantRoutes;
