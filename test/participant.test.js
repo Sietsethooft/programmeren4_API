@@ -309,6 +309,17 @@ describe('UC-404: Get Participant by ID', () => {
     });
 
     // TC-404-4: Participant not found
+    it('TC-404-4 Should return 404 if participant not found', (done) => {
+        chai.request(app)
+            .get(`/api/meal/${mealId}/participants/999999`) // Non-existing participant ID
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Participant not found.');
+                done();
+            });
+    });
 
     // TC-404-5: Successfully fetched participant
 });
