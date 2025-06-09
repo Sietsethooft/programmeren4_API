@@ -31,7 +31,7 @@ const userServices = {
     },
 
     findUserByEmail: (emailAdress, callback) => {
-        const query = `SELECT * FROM user WHERE emailAdress = ?`;
+        const query = `SELECT emailAdress FROM user WHERE emailAdress = ?`;
     
         db.query(query, [emailAdress], (error, results) => {
             if (error) return callback(error);
