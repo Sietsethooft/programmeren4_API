@@ -20,7 +20,7 @@ const participantService = {
                 logger.error(`Error checking participant: ${error.message}`);
                 return callback(error);
             }
-            callback(null, results); // Participant does not exist
+            callback(null, results);
         });
     },
 
