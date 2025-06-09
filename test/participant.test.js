@@ -283,6 +283,17 @@ describe('UC-404: Get Participant by ID', () => {
     });
 
     // TC-404-2: Meal not found
+    it('TC-404-2 Should return 404 if meal not found', (done) => {
+        chai.request(app)
+            .get('/api/meal/999999/participants/1') // Non-existing meal ID
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Meal not found.');
+                done();
+            });
+    });
 
     // TC-404-3: Not the owner of the meal
 
