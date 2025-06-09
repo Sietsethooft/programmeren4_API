@@ -85,6 +85,44 @@ const participantController = {
                 });
             });
         });
+    },
+
+    getParticipants: (req, res, next) => { // UC-403
+        const mealId = parseInt(req.params.mealId, 10);
+        const loggedInUserId = req.user.userId; // Get the userId from the token
+
+        mealService.getMealById(mealId, (error, meals) => {
+            if (error) return next(error); // This sends the error to the error handler in util.
+
+            if (!meals || meals.length === 0) { // Check if the meal exists
+                logger.warn(`Meal with ID #${mealId} not found`);
+                return res.status(404).json({
+                    status: 404,
+                    message: `Meal not found.`,
+                    data: {}
+                });
+            }
+
+            const meal = meals[0]; // Get the first meal from the result
+            if (meal.cook.id !== loggedInUserId) { // Check if the logged-in user is the cook of the meal
+                logger.warn(`User with ID #${loggedInUserId} is not the cook of meal with ID #${mealId}`);
+                return res.status(403).json({
+                    status: 403,
+                    message: `You are not the owner of this meal.`,
+                    data: {}
+                });
+            }
+
+            participantService.getParticipants(mealId, (error, participants) => {
+                if (error) return next(error); // This sends the error to the error handler in util.
+                logger.info(`Fetched participants for meal with ID #${mealId}`);
+                res.status(200).json({
+                    status: 200,
+                    message: `Participants fetched successfully.`,
+                    data: {participants}
+                });
+            });
+        });
     }
 }
 
