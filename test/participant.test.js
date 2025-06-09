@@ -210,6 +210,12 @@ describe('UC-402: Delete Participant', () => {
     });
 });
 
+describe('UC-403: Get Participants', () => {
+    // TC-403-1: Not authenticated
+    // TC-403-2: Meal not found
+    // TC-403-3: Not the owner of the meal
+    // TC-403-4: Successfully fetched participants
+    });
 });
 
 after((done) => {
