@@ -322,6 +322,19 @@ describe('UC-404: Get Participant by ID', () => {
     });
 
     // TC-404-5: Successfully fetched participant
+    it('TC-404-5 Should return 200 when successfully fetched participant', (done) => {
+        chai.request(app)
+            .get(`/api/meal/${mealId}/participants/${userId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equals('Participant fetched successfully.');
+                expect(res.body.data).to.have.property('participant');
+                expect(res.body.data.participant).to.have.all.keys('id', 'firstName', 'lastName', 'emailAdress', 'phonenumber', 'isActive', 'street', 'city');
+                done();
+            });
+    });
 });
 
 after((done) => {
