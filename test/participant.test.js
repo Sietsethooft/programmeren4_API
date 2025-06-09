@@ -153,63 +153,6 @@ describe('UC-401: Create Participant', () => {
     });
 });
 
-describe('UC-402: Delete Participant', () => {
-    // TC-402-1: Not authenticated
-    it('TC-402-1 Should return 401 if not authenticated', (done) => {
-        chai.request(app)
-            .delete(`/api/meal/${mealId}/participate`)
-            .end((err, res) => {
-                expect(res).to.have.status(401);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equals('Access token is missing or invalid.');
-                done();
-            });
-    });
-
-    // TC-402-2: Meal not found
-    it('TC-402-2 Should return 404 if meal not found', (done) => {
-        chai.request(app)
-            .delete('/api/meal/999999/participate') // Non-existing meal ID
-            .set('Authorization', `Bearer ${token}`)
-            .end((err, res) => {
-                expect(res).to.have.status(404);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equals('Meal not found.');
-                done();
-            });
-    });
-
-    // TC-402-3: User is not a participant of this meal
-    it('TC-402-3 Should return 404 if user is not a participant of this meal', (done) => {
-        chai.request(app)
-            .delete(`/api/meal/${mealId}/participate`)
-            .set('Authorization', `Bearer ${otherToken}`) // Use other user to test
-            .end((err, res) => {
-                expect(res).to.have.status(404);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equals('User is not a participant of this meal.');
-                done();
-            });
-    });
-
-    // TC-402-4: Successfully deleted participant
-    it('TC-402-4 Should return 200 when successfully unsubscribed from meal', (done) => {
-        chai.request(app)
-            .delete(`/api/meal/${mealId}/participate`)
-            .set('Authorization', `Bearer ${token}`)
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data');
-                expect(res.body).to.have.property('message').that.equals(`User with ID ${userId} has unsubscribed from meal with ID ${mealId}`);
-                expect(res.body.data).to.have.property('participant');
-                expect(res.body.data.participant).to.have.all.keys('mealId', 'userId');
-                expect(res.body.data.participant.mealId).to.equal(mealId);
-                expect(res.body.data.participant.userId).to.equal(userId);
-                done();
-            });
-    });
-});
-
 describe('UC-403: Get Participants', () => {
     // TC-403-1: Not authenticated
     it('TC-403-1 Should return 401 if not authenticated', (done) => {
@@ -332,6 +275,63 @@ describe('UC-404: Get Participant by ID', () => {
                 expect(res.body).to.have.property('message').that.equals('Participant fetched successfully.');
                 expect(res.body.data).to.have.property('participant');
                 expect(res.body.data.participant).to.have.all.keys('id', 'firstName', 'lastName', 'emailAdress', 'phonenumber', 'isActive', 'street', 'city');
+                done();
+            });
+    });
+});
+
+describe('UC-402: Delete Participant', () => { // It is not between the 401 and 403, because otherwise other tests will fail.
+    // TC-402-1: Not authenticated
+    it('TC-402-1 Should return 401 if not authenticated', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}/participate`)
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Access token is missing or invalid.');
+                done();
+            });
+    });
+
+    // TC-402-2: Meal not found
+    it('TC-402-2 Should return 404 if meal not found', (done) => {
+        chai.request(app)
+            .delete('/api/meal/999999/participate') // Non-existing meal ID
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Meal not found.');
+                done();
+            });
+    });
+
+    // TC-402-3: User is not a participant of this meal
+    it('TC-402-3 Should return 404 if user is not a participant of this meal', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}/participate`)
+            .set('Authorization', `Bearer ${otherToken}`) // Use other user to test
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('User is not a participant of this meal.');
+                done();
+            });
+    });
+
+    // TC-402-4: Successfully deleted participant
+    it('TC-402-4 Should return 200 when successfully unsubscribed from meal', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}/participate`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equals(`User with ID ${userId} has unsubscribed from meal with ID ${mealId}`);
+                expect(res.body.data).to.have.property('participant');
+                expect(res.body.data.participant).to.have.all.keys('mealId', 'userId');
+                expect(res.body.data.participant.mealId).to.equal(mealId);
+                expect(res.body.data.participant.userId).to.equal(userId);
                 done();
             });
     });
