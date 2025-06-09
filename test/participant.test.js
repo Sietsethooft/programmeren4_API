@@ -237,6 +237,18 @@ describe('UC-403: Get Participants', () => {
     });
 
     // TC-403-3: Not the owner of the meal
+    it('TC-403-3 Should return 403 if not the owner of the meal', (done) => {
+        chai.request(app)
+            .get(`/api/meal/${mealId}/participants`)
+            .set('Authorization', `Bearer ${otherToken}`) // Use other user to test
+            .end((err, res) => {
+                expect(res).to.have.status(403);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('You are not the owner of this meal.');
+                done();
+            });
+    });
+
     // TC-403-4: Successfully fetched participants
     });
 });
