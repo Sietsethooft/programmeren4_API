@@ -13,15 +13,11 @@ let token; // Variable to store the token for authenticated requests
 let mealId; // Variable to store the meal ID for participant tests
 let userId; // Variable to store the user ID for cleanup after tests
 
-describe('UC-401: Create Participant', () => {
-    // TC-401-1: Not authenticated
 const userEmail = 'p.test@testcase.nl';
 const userPassword = 'Testpassword1234';
 
-    // TC-401-2: Meal not found
 chai.use(chaiHttp);
 
-    // TC-401-3: Successfully signed up for meal
 before((done) => { // Before all tests, create a user and log in to get a token
   chai.request(app)
     .post('/api/user')
@@ -67,6 +63,16 @@ before((done) => {
         });
 });
 
+describe('UC-401: Create Participant', () => {
+    // TC-401-1: Not authenticated
+
+    // TC-401-2: Meal not found
+
+    // TC-401-3: Successfully signed up for meal
+
+    // TC-401-4: Meal has reached maximum number of participants
+});
+
 describe('UC-402: Delete Participant', () => {
     // TC-402-1: Not authenticated
 
@@ -75,6 +81,8 @@ describe('UC-402: Delete Participant', () => {
     // TC-402-3: User is not a participant of this meal
 
     // TC-402-4: Successfully deleted participant
+});
+
 after((done) => {
     // Clean up: Delete the created meal first, then the user
     chai.request(app)
