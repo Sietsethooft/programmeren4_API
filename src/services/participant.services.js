@@ -44,6 +44,17 @@ const participantService = {
             }
             callback(null, results);
         });
+    },
+
+    getParticipantById: (mealId, participantId, callback) => {
+        const query = `SELECT id, firstName, lastName, emailAdress, phonenumber, isActive, street, city FROM user WHERE id = ? AND id IN ( SELECT userId FROM meal_participants_user WHERE mealId = ? )`;
+        db.query(query, [participantId, mealId], (error, results) => {
+            if (error) {
+                logger.error(`Error fetching participant by ID: ${error.message}`);
+                return callback(error);
+            }
+            callback(null, results[0]);
+        });
     }
 }
 
