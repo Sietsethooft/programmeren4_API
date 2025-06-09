@@ -263,7 +263,7 @@ describe('UC-403: Get Participants', () => {
                 res.body.data.participants.forEach(element => {
                     expect(element).to.have.all.keys('id', 'firstName', 'lastName', 'emailAdress', 'phonenumber', 'isActive', 'street', 'city');
                 });
-                
+
                 done();
             });
     });
@@ -271,6 +271,16 @@ describe('UC-403: Get Participants', () => {
 
 describe('UC-404: Get Participant by ID', () => {
     // TC-404-1: Not authenticated
+    it('TC-404-1 Should return 401 if not authenticated', (done) => {
+        chai.request(app)
+            .get(`/api/meal/${mealId}/participants/${userId}`)
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Access token is missing or invalid.');
+                done();
+            });
+    });
 
     // TC-404-2: Meal not found
 
