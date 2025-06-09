@@ -123,6 +123,21 @@ describe('UC-401: Create Participant', () => {
     });
 
     // TC-401-3: Successfully signed up for meal
+    it('TC-401-3 Should return 200 when successfully signed up for meal', (done) => {
+        chai.request(app)
+            .post(`/api/meal/${mealId}/participate`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equals(`User with ID ${userId} has signed up for meal with ID ${mealId}`);
+                expect(res.body.data).to.have.property('participant');
+                expect(res.body.data.participant).to.have.all.keys('mealId', 'userId');
+                expect(res.body.data.participant.mealId).to.equal(mealId);
+                expect(res.body.data.participant.userId).to.equal(userId);
+                done();
+            });
+    });
 
     // TC-401-4: Meal has reached maximum number of participants
 });
