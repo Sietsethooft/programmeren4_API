@@ -37,9 +37,9 @@ const participantController = {
             participantService.createParticipant(mealId, loggedInUserId, (error, result) => {
                 if (error) return next(error); // This sends the error to the error handler in util.    
                 logger.info(`User with ID #${loggedInUserId} has signed up for meal with ID #${mealId}`);
-                res.status(201).json({
-                    status: 201,
-                    message: `User with ID #${loggedInUserId} has signed up for meal with ID #${mealId}`,
+                res.status(200).json({
+                    status: 200,
+                    message: `User with ID ${loggedInUserId} has signed up for meal with ID ${mealId}`,
                     data: {participant: result}
                 });
             });
@@ -79,7 +79,7 @@ const participantController = {
                     logger.info(`User with ID #${loggedInUserId} has unsubscribed from meal with ID #${mealId}`);
                     res.status(200).json({
                         status: 200,
-                        message: `User with ID #${loggedInUserId} has unsubscribed from meal with ID #${mealId}`,
+                        message: `User with ID ${loggedInUserId} has unsubscribed from meal with ID ${mealId}`,
                         data: {participant: result}
                     });
                 });
