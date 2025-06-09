@@ -19,6 +19,8 @@ const participantController = {
                 });
             }
 
+            const meal = meals[0]; // Get the first meal from the result
+
             if (!Array.isArray(meal.participants)) { // Ensure participants is an array
                 meal.participants = [];
             }
