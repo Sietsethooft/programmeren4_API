@@ -109,6 +109,18 @@ describe('UC-401: Create Participant', () => {
     });
 
     // TC-401-2: Meal not found
+    it('TC-401-2 Should return 404 if meal not found', (done) => {
+        chai.request(app)
+            .post('/api/meal/999999/participate') // Non-existing meal ID
+            .set('Authorization', `Bearer ${token}`)
+            .send({ userId: userId })
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Meal not found.');
+                done();
+            });
+    });
 
     // TC-401-3: Successfully signed up for meal
 
