@@ -201,7 +201,7 @@ describe('UC-403: Get Participants', () => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equals('Participants fetched successfully.');
-                expect(res.body.data).to.have.property('participants').that.is.an('array');
+                expect(res.body.data).to.have.property('participants').that.is.an('array').with.length.greaterThan(0);
                
                 res.body.data.participants.forEach(element => {
                     expect(element).to.have.all.keys('id', 'firstName', 'lastName', 'emailAdress', 'phonenumber', 'isActive', 'street', 'city');
