@@ -250,6 +250,17 @@ describe('UC-403: Get Participants', () => {
     });
 
     // TC-403-4: Successfully fetched participants
+    it('TC-403-4 Should return 200 when successfully fetched participants', (done) => {
+        chai.request(app)
+            .get(`/api/meal/${mealId}/participants`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equals('Participants fetched successfully.');
+                expect(res.body.data).to.have.property('participants').that.is.an('array');
+                done();
+            });
     });
 });
 
