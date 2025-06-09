@@ -193,6 +193,23 @@ describe('UC-402: Delete Participant', () => {
     });
 
     // TC-402-4: Successfully deleted participant
+    it('TC-402-4 Should return 200 when successfully unsubscribed from meal', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}/participate`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equals(`User with ID ${userId} has unsubscribed from meal with ID ${mealId}`);
+                expect(res.body.data).to.have.property('participant');
+                expect(res.body.data.participant).to.have.all.keys('mealId', 'userId');
+                expect(res.body.data.participant.mealId).to.equal(mealId);
+                expect(res.body.data.participant.userId).to.equal(userId);
+                done();
+            });
+    });
+});
+
 });
 
 after((done) => {
