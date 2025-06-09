@@ -140,6 +140,17 @@ describe('UC-401: Create Participant', () => {
     });
 
     // TC-401-4: Meal has reached maximum number of participants
+    it('TC-401-4 Should return 200 if meal has reached maximum number of participants', (done) => {
+        chai.request(app)
+            .post(`/api/meal/${mealId}/participate`)
+            .set('Authorization', `Bearer ${otherToken}`) // Use other user to test
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Meal has reached maximum number of participants.');
+                done();
+            });
+    });
 });
 
 describe('UC-402: Delete Participant', () => {
