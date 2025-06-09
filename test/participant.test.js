@@ -167,6 +167,17 @@ describe('UC-402: Delete Participant', () => {
     });
 
     // TC-402-2: Meal not found
+    it('TC-402-2 Should return 404 if meal not found', (done) => {
+        chai.request(app)
+            .delete('/api/meal/999999/participate') // Non-existing meal ID
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Meal not found.');
+                done();
+            });
+    });
 
     // TC-402-3: User is not a participant of this meal
 
