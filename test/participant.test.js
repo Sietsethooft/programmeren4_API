@@ -180,6 +180,17 @@ describe('UC-402: Delete Participant', () => {
     });
 
     // TC-402-3: User is not a participant of this meal
+    it('TC-402-3 Should return 404 if user is not a participant of this meal', (done) => {
+        chai.request(app)
+            .delete(`/api/meal/${mealId}/participate`)
+            .set('Authorization', `Bearer ${otherToken}`) // Use other user to test
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('User is not a participant of this meal.');
+                done();
+            });
+    });
 
     // TC-402-4: Successfully deleted participant
 });
