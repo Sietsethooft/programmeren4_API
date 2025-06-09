@@ -96,6 +96,17 @@ before((done) => {
 
 describe('UC-401: Create Participant', () => {
     // TC-401-1: Not authenticated
+    it('TC-401-1 Should return 401 if not authenticated', (done) => {
+        chai.request(app)
+            .post(`/api/meal/${mealId}/participate`)
+            .send({ userId: userId })
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Access token is missing or invalid.');
+                done();
+            });
+    });
 
     // TC-401-2: Meal not found
 
