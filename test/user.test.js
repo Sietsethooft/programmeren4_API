@@ -260,8 +260,8 @@ describe('UC-202 get all users', () => {
                 expect(res.body.data).to.have.property('users').that.is.an('array');
                 res.body.data.users.forEach(user => {
                     expect(user.isActive).to.equal(0); // Check if isActive is false (0)
+                    expect(user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
                 });
-                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
                 done();
             });
     });
@@ -384,7 +384,7 @@ describe('UC-205 update user', () => {
         chai.request(app)
             .put(`/api/user/${userId}`) // Use the stored userId from registration
             .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({ firstName: 'Maria', lastName: 'Johnes', phonenumber: '06-87654321' }) // missing emailAdress
+            .send({ firstName: 'Maria', lastName: 'Johnes', phonenumber: '06-87654321'}) // missing emailAdress
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
