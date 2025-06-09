@@ -25,11 +25,11 @@ const participantController = {
                 meal.participants = [];
             }
              
-            if (meal.participants.length >= meal.maxParticipants) { // Check if the meal has reached the maximum number of participants
+            if (meal.participants.length >= meal.maxAmountOfParticipants) { // Check if the meal has reached the maximum number of participants
                 logger.warn(`Meal with ID #${mealId} has reached the maximum number of participants`);
                 return res.status(200).json({
                     status: 200,
-                    message: `This meal has reached the maximum number of participants.`,
+                    message: `Meal has reached maximum number of participants.`,
                     data: {}
                 });
             }
