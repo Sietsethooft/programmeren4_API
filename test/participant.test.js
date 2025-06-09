@@ -259,6 +259,11 @@ describe('UC-403: Get Participants', () => {
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equals('Participants fetched successfully.');
                 expect(res.body.data).to.have.property('participants').that.is.an('array');
+               
+                res.body.data.participants.forEach(element => {
+                    expect(element).to.have.all.keys('id', 'firstName', 'lastName', 'emailAdress', 'phonenumber', 'isActive', 'street', 'city');
+                });
+                
                 done();
             });
     });
