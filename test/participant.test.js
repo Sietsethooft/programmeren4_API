@@ -212,6 +212,17 @@ describe('UC-402: Delete Participant', () => {
 
 describe('UC-403: Get Participants', () => {
     // TC-403-1: Not authenticated
+    it('TC-403-1 Should return 401 if not authenticated', (done) => {
+        chai.request(app)
+            .get(`/api/meal/${mealId}/participants`)
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equals('Access token is missing or invalid.');
+                done();
+            });
+    });
+
     // TC-403-2: Meal not found
     // TC-403-3: Not the owner of the meal
     // TC-403-4: Successfully fetched participants
