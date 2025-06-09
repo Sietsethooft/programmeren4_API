@@ -16,6 +16,11 @@ let userId; // Variable to store the user ID for cleanup after tests
 const userEmail = 'p.test@testcase.nl';
 const userPassword = 'Testpassword1234';
 
+const otherUserEmail = 'o.test@testcase.nl';
+const otherUserPassword = 'OtherTestpassword1234';
+let otherToken;
+let otherUserId;
+
 chai.use(chaiHttp);
 
 before((done) => { // Before all tests, create a user and log in to get a token
@@ -39,6 +44,32 @@ before((done) => { // Before all tests, create a user and log in to get a token
         .end((err, res) => {
             token = res.body.data.token;
             userId = res.body.data.user.id;
+            done();
+        });
+    });
+});
+
+before((done) => { // Before all tests, create a user and log in to get a token
+  chai.request(app)
+    .post('/api/user')
+    .send({ 
+        firstName: 'Jan', 
+        lastName: 'Klaasen', 
+        street: 'Damstraat 1', 
+        city: 'Amsterdam', 
+        emailAdress: otherUserEmail,
+        password: otherUserPassword,
+        phonenumber: '06-12345678'})
+    .end(() => {
+      chai.request(app)
+        .post('/api/login')
+        .send({
+            emailAdress: otherUserEmail,
+            password: otherUserPassword
+        })
+        .end((err, res) => {
+            otherToken = res.body.data.token;
+            otherUserId = res.body.data.user.id;
             done();
         });
     });
@@ -93,7 +124,12 @@ after((done) => {
                 .delete(`/api/user/${userId}`)
                 .set('Authorization', `Bearer ${token}`)
                 .end(() => {
-                    done();
+                    chai.request(app)
+                        .delete(`/api/user/${otherUserId}`)
+                        .set('Authorization', `Bearer ${otherToken}`)
+                        .end(() => {
+                            done();
+                        });
                 });
         });
 });
