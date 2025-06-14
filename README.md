@@ -52,6 +52,7 @@ npm install
 
 4. Voeg volgende attributen toe aan .env bestand:
 
+```bash
 - PORT
 - DB_HOST
 - DB_PORT
@@ -59,6 +60,7 @@ npm install
 - DB_NAME
 - LOGLEVEL
 - JWT_SECRET
+```
 
 5. Start de applicatie:
 
