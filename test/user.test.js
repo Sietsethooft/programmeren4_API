@@ -217,6 +217,135 @@ before((done) => { // Register a user before running the get all test
         });
 });
 
+let tempUserId2, tempToken2; // Temporary variables to store user ID and token for the get all users test
+
+before((done) => { // Register a user before running the get all test
+    chai.request(app)
+        .post('/api/user')
+        .send({ 
+            firstName: 'Maria', 
+            lastName: 'Josheff', 
+            street: 'Damstraat 6', 
+            city: 'Amsterdam', 
+            emailAdress: 'm.joshegh@gmail.com',
+            password: userPassword,
+            phonenumber: '06-12345678'
+        })
+        .end((err, res) => {
+            chai.request(app) // Get the token
+                .post('/api/login')
+                .send({
+                    emailAdress: 'm.joshegh@gmail.com',
+                    password: userPassword
+                })
+                .end((err, res) => {
+                    tempToken2 = res.body.data.token;
+                    tempUserId2 = res.body.data.user.id;
+                    chai.request(app) // Update the isActive field to 0 for the user
+                        .put(`/api/user/${tempUserId2}`)
+                        .set('Authorization', `Bearer ${tempToken2}`)
+                        .send({
+                            emailAdress: 'm.joshegh@gmail.com',
+                            isActive: 0
+                        })
+                        .end(() => {
+                            done();
+                        });
+                });
+        });
+});
+
+describe('UC-202 get all users', () => {
+    // TC-202-1: get all users (minimal 2 users)
+    it('TC-202-1: should return 200 and all users', (done) => {
+        chai.request(app)
+            .get('/api/user')
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                userIdOtherPerson = res.body.data.users[0].id; // Store another user's email for later use
+                done();
+            });
+    });
+
+    // TC-202-2: get all users with invalid filter
+    it('TC-202-2: should return 200 if filter is invalid', (done) => {
+        chai.request(app)
+            .get('/api/user?invalidFilter=123') // Invalid filter
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data')
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
+                done();
+            });
+    });
+
+    // TC-202-3: get all users with filter ‘isActive’=false
+    it ('TC-202-3: should return 200 and users with isActive=false', (done) => {
+        chai.request(app)
+            .get('/api/user?isActive=false') // Filter for inactive users
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                res.body.data.users.forEach(user => {
+                    expect(user.isActive).to.equal(0); // Check if isActive is false (0)
+                    expect(user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                });
+                done();
+            });
+    });
+
+    // TC-202-4: get all users with filter ‘isActive’=true
+    it ('TC-202-4: should return 200 and users with isActive=true', (done) => {
+        chai.request(app)
+            .get('/api/user?isActive=true') // Filter for active users
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                res.body.data.users.forEach(user => {
+                    expect(user.isActive).to.equal(1); // Check if isActive is true (1)
+                });
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                done();
+            });
+    });
+
+    // TC-202-5: get all users with filter 'city=Amsterdam' and 'firstname=Maria'
+    it ('TC-202-5: should return 200 and users with city=Amsterdam and firstname=Maria', (done) => {
+        chai.request(app)
+            .get('/api/user?city=Amsterdam&firstName=Maria') // Filter for users in Amsterdam with first name Maria
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
+                expect(res.body.data).to.have.property('users').that.is.an('array');
+                res.body.data.users.forEach(user => {
+                    expect(user.city).to.equal('Amsterdam'); // Check if city is Amsterdam
+                    expect(user.firstName).to.equal('Maria'); // Check if first name is Maria
+                });
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
+                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                done();
+            });
+    });
+});
+
+
 describe('UC-203 get user by profile', () => {
     // TC-203-1: Get user profile without authentication
     it('TC-203-1: should return 401 if user is not authenticated', (done) => {
@@ -378,96 +507,6 @@ describe('UC-205 update user', () => {
     });
 });
 
-describe('UC-202 get all users', () => {
-    // TC-202-1: get all users (minimal 2 users)
-    it('TC-202-1: should return 200 and all users', (done) => {
-        chai.request(app)
-            .get('/api/user')
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data');
-                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
-                expect(res.body.data).to.have.property('users').that.is.an('array');
-                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
-                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
-                userIdOtherPerson = res.body.data.users[0].id; // Store another user's email for later use
-                done();
-            });
-    });
-
-    // TC-202-2: get all users with invalid filter
-    it('TC-202-2: should return 200 if filter is invalid', (done) => {
-        chai.request(app)
-            .get('/api/user?invalidFilter=123') // Invalid filter
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data')
-                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
-                done();
-            });
-    });
-
-    // TC-202-3: get all users with filter ‘isActive’=false
-    it ('TC-202-3: should return 200 and users with isActive=false', (done) => {
-        chai.request(app)
-            .get('/api/user?isActive=false') // Filter for inactive users
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data');
-                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
-                expect(res.body.data).to.have.property('users').that.is.an('array');
-                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
-                res.body.data.users.forEach(user => {
-                    expect(user.isActive).to.equal(0); // Check if isActive is false (0)
-                    expect(user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
-                });
-                done();
-            });
-    });
-
-    // TC-202-4: get all users with filter ‘isActive’=true
-    it ('TC-202-4: should return 200 and users with isActive=true', (done) => {
-        chai.request(app)
-            .get('/api/user?isActive=true') // Filter for active users
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data');
-                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
-                expect(res.body.data).to.have.property('users').that.is.an('array');
-                res.body.data.users.forEach(user => {
-                    expect(user.isActive).to.equal(1); // Check if isActive is true (1)
-                });
-                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
-                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
-                done();
-            });
-    });
-
-    // TC-202-5: get all users with filter 'city=Amsterdam' and 'firstname=Maria'
-    it ('TC-202-5: should return 200 and users with city=Amsterdam and firstname=Maria', (done) => {
-        chai.request(app)
-            .get('/api/user?city=Amsterdam&firstName=Maria') // Filter for users in Amsterdam with first name Maria
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data');
-                expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
-                expect(res.body.data).to.have.property('users').that.is.an('array');
-                res.body.data.users.forEach(user => {
-                    expect(user.city).to.equal('Amsterdam'); // Check if city is Amsterdam
-                    expect(user.firstName).to.equal('Maria'); // Check if first name is Maria
-                });
-                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
-                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
-                done();
-            });
-    });
-});
-
 describe('UC-206 delete user', () => {
     // TC-206-1: User not found
     it('TC-206-1: should return 404 if user does not exist', (done) => {
@@ -526,6 +565,19 @@ after((done) => {
         chai.request(app)
             .delete(`/api/user/${tempUserId}`)
             .set('Authorization', `Bearer ${tempToken}`)
+            .end(() => {
+                done();
+            });
+    } else {
+        done();
+    }
+});
+
+after((done) => {
+    if (tempUserId2 && tempToken2) {
+        chai.request(app)
+            .delete(`/api/user/${tempUserId2}`)
+            .set('Authorization', `Bearer ${tempToken2}`)
             .end(() => {
                 done();
             });
