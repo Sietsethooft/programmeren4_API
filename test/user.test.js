@@ -217,6 +217,44 @@ before((done) => { // Register a user before running the get all test
         });
 });
 
+let tempUserId2, tempToken2; // Temporary variables to store user ID and token for the get all users test
+
+before((done) => { // Register a user before running the get all test
+    chai.request(app)
+        .post('/api/user')
+        .send({ 
+            firstName: 'Maria', 
+            lastName: 'Josheff', 
+            street: 'Damstraat 6', 
+            city: 'Amsterdam', 
+            emailAdress: 'm.joshegh@gmail.com',
+            password: userPassword,
+            phonenumber: '06-12345678'
+        })
+        .end((err, res) => {
+            chai.request(app) // Get the token
+                .post('/api/login')
+                .send({
+                    emailAdress: 'm.joshegh@gmail.com',
+                    password: userPassword
+                })
+                .end((err, res) => {
+                    tempToken2 = res.body.data.token;
+                    tempUserId2 = res.body.data.user.id;
+                    chai.request(app) // Update the isActive field to 0 for the user
+                        .put(`/api/user/${tempUserId2}`)
+                        .set('Authorization', `Bearer ${tempToken2}`)
+                        .send({
+                            emailAdress: 'm.joshegh@gmail.com',
+                            isActive: 0
+                        })
+                        .end(() => {
+                            done();
+                        });
+                });
+        });
+});
+
 describe('UC-202 get all users', () => {
     // TC-202-1: get all users (minimal 2 users)
     it('TC-202-1: should return 200 and all users', (done) => {
@@ -258,10 +296,11 @@ describe('UC-202 get all users', () => {
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
                 expect(res.body.data).to.have.property('users').that.is.an('array');
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
                 res.body.data.users.forEach(user => {
                     expect(user.isActive).to.equal(0); // Check if isActive is false (0)
+                    expect(user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
                 });
-                expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
                 done();
             });
     });
@@ -384,7 +423,7 @@ describe('UC-205 update user', () => {
         chai.request(app)
             .put(`/api/user/${userId}`) // Use the stored userId from registration
             .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({ firstName: 'Maria', lastName: 'Johnes', phonenumber: '06-87654321' }) // missing emailAdress
+            .send({ firstName: 'Maria', lastName: 'Johnes', phonenumber: '06-87654321'}) // missing emailAdress
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body).to.have.property('data').that.deep.equals({});
@@ -453,7 +492,7 @@ describe('UC-205 update user', () => {
         chai.request(app)
             .put(`/api/user/${userId}`) // Use the stored userId from registration
             .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({emailAdress: 'm.johnes@test.com', street: 'damstraat 1'})
+            .send({emailAdress: 'm.johnes@test.com', street: 'damstraat 1', isActive: 0})
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.have.property('data');
@@ -525,6 +564,19 @@ after((done) => {
         chai.request(app)
             .delete(`/api/user/${tempUserId}`)
             .set('Authorization', `Bearer ${tempToken}`)
+            .end(() => {
+                done();
+            });
+    } else {
+        done();
+    }
+});
+
+after((done) => {
+    if (tempUserId2 && tempToken2) {
+        chai.request(app)
+            .delete(`/api/user/${tempUserId2}`)
+            .set('Authorization', `Bearer ${tempToken2}`)
             .end(() => {
                 done();
             });

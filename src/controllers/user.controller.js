@@ -126,7 +126,8 @@ const userController = {
             }
 
             if (loggedInUserId !== userId) {
-                return next({
+                logger.warn(`User with ID ${loggedInUserId} is trying to update user with ID ${userId} without permission`);
+                return res.status(403).json({
                     status: 403,
                     message: "User is not the owner of this account",
                     data: {}

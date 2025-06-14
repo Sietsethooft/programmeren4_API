@@ -54,7 +54,8 @@ const mealController = {
             }
 
             if (loggedInUserId !== cookId) {
-                return next({
+                logger.warn(`User with ID ${loggedInUserId} is not the owner of meal with ID ${mealId}`);
+                return res.status(403).json({
                     status: 403,
                     message: "User is not the owner of this meal",
                     data: {}
@@ -127,7 +128,8 @@ const mealController = {
             }
 
             if (loggedInUserId !== cookId) {
-                return next({
+                logger.warn(`User with ID ${loggedInUserId} is not the owner of meal with ID ${mealId}`);
+                return res.status(403).json({
                     status: 403,
                     message: "User is not the owner of this meal",
                     data: {}

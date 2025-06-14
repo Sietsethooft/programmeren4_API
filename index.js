@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const userRoutes = require('./src/routes/user.routes');
 const authRoutes = require('./src/routes/auth.routes');
 const mealRoutes = require('./src/routes/meal.routes');
+const participantRoutes = require('./src/routes/participant.routes');
 require('dotenv').config();
 
 const app = express();
@@ -32,6 +33,7 @@ app.get('/info', (req, res) => {
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', mealRoutes);
+app.use('/api/meal', participantRoutes)
 
 app.use(errorHandler);
 
