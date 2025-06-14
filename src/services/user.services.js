@@ -106,7 +106,7 @@ const userServices = {
     },
 
     updateUser: (userId, userData, callback) => {
-        const allowedFields = ['firstName', 'lastName', 'street', 'city', 'emailAdress', 'password', 'phonenumber']; // Allowed fields for updating
+        const allowedFields = ['firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber']; // Allowed fields for updating
         const updates = [];
         const params = [];
         // Dynamically build the update query based on provided fields

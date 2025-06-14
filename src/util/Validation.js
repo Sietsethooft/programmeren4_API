@@ -21,6 +21,7 @@ const validation = {
             lastName: joi.string(),
             street: joi.string(),
             city: joi.string(),
+            isActive: joi.number().valid(0, 1),
             emailAdress: joi.string().pattern(new RegExp('^[a-z]{1}\\.[a-z]{2,}@[a-z]{2,}\\.[a-z]{2,3}$')).required(),
             password: joi.string().min(8).pattern(new RegExp('^(?=.*[A-Z])(?=.*\\d).*$')),
             phonenumber: joi.string().pattern(new RegExp('^06[\\s-]?\\d{8}$'))
