@@ -217,6 +217,95 @@ before((done) => { // Register a user before running the get all test
         });
 });
 
+describe('UC-205 update user', () => {
+    // TC-205-1: Emailadress field is missing
+    it('TC-205-1: should return 400 if emailAdress field is missing', (done) => {
+        chai.request(app)
+            .put(`/api/user/${userId}`) // Use the stored userId from registration
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .send({ firstName: 'Maria', lastName: 'Johnes', phonenumber: '06-87654321'}) // missing emailAdress
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Validation error: EmailAdress is not in the correct format. An email address needs to follow the pattern: n.last@domain.com where lastname contains at least 2 characters.');
+                done();
+            });
+    });
+
+    // TC-205-2 User is not the owner
+    it('TC-205-2: should return 403 if user is not the owner', (done) => {
+        chai.request(app)
+            .put(`/api/user/${userIdOtherPerson}`) // Use the stored userId from another user
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .send({ firstName: 'John', lastName: 'Doe', emailAdress: 'j.doe@outlook.com', phonenumber: '06-87654321' }) // Trying to update another user's profile
+            .end((err, res) => {
+                expect(res).to.have.status(403);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User is not the owner of this account');
+                done();
+            });
+    });
+
+    // TC-205-3: Phonenumber is not valid
+    it('TC-205-3: should return 400 if phonenumber is not valid', (done) => {
+        chai.request(app)
+            .put(`/api/user/${userId}`) // Use the stored userId from registration
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .send({ firstName: 'Maria', lastName: 'Johnes', emailAdress: 'm.johnes@test.com', phonenumber: '08-87654321' }) // invalid phonenumber
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Validation error: Phonenumber must start with 06 and contain 10 digits.');
+                done();
+            });
+    });
+    
+    // TC-205-4: User not found
+    it ('TC-205-4: should return 404 if user does not exist', (done) => {
+        chai.request(app)
+            .put('/api/user/999949309') // invalid user ID
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .send({ firstName: 'Maria', lastName: 'Johnes', emailAdress: 'm.johnes@test.com'})
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User not found');
+                done();
+            });
+    });
+
+    // TC-205-5: User not authenticated
+    it('TC-205-5: should return 401 if user is not authenticated', (done) => {
+        chai.request(app)
+            .put(`/api/user/${userId}`) // Use the stored userId from registration
+            .send({ firstName: 'Maria', lastName: 'Johnes', emailAdress: 'm.johnes@test.com'})
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Access token is missing or invalid.');
+                done();
+            })
+    });
+
+    // TC-205-6: User successfully updated
+    it('TC-205-6: should return 200 and updated user data on successful update', (done) => {
+        chai.request(app)
+            .put(`/api/user/${userId}`) // Use the stored userId from registration
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .send({emailAdress: 'm.johnes@test.com', street: 'damstraat 1', isActive: 0})
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data');
+                expect(res.body).to.have.property('message').that.equal('User updated successfully');
+                expect(res.body.data).to.have.property('user');
+                expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
+                expect(res.body.data.user.password).to.not.equal(userPassword); // Check if the password is hashed
+                expect(res.body.data.user.street).to.equal('damstraat 1'); // Check if the street is updated
+                done();
+            });
+    });
+});
+
 describe('UC-202 get all users', () => {
     // TC-202-1: get all users (minimal 2 users)
     it('TC-202-1: should return 200 and all users', (done) => {
@@ -258,6 +347,7 @@ describe('UC-202 get all users', () => {
                 expect(res.body).to.have.property('data');
                 expect(res.body).to.have.property('message').that.equal('Users retrieved successfully');
                 expect(res.body.data).to.have.property('users').that.is.an('array');
+                expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
                 res.body.data.users.forEach(user => {
                     expect(user.isActive).to.equal(0); // Check if isActive is false (0)
                     expect(user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
@@ -373,95 +463,6 @@ describe('UC-204 get user by id', () => {
                 expect(res.body).to.have.property('message').that.equal('User retrieved successfully');
                 expect(res.body.data).to.have.property('user');
                 expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber', 'meals');
-                done();
-            });
-    });
-});
-
-describe('UC-205 update user', () => {
-    // TC-205-1: Emailadress field is missing
-    it('TC-205-1: should return 400 if emailAdress field is missing', (done) => {
-        chai.request(app)
-            .put(`/api/user/${userId}`) // Use the stored userId from registration
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({ firstName: 'Maria', lastName: 'Johnes', phonenumber: '06-87654321'}) // missing emailAdress
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('Validation error: EmailAdress is not in the correct format. An email address needs to follow the pattern: n.last@domain.com where lastname contains at least 2 characters.');
-                done();
-            });
-    });
-
-    // TC-205-2 User is not the owner
-    it('TC-205-2: should return 403 if user is not the owner', (done) => {
-        chai.request(app)
-            .put(`/api/user/${userIdOtherPerson}`) // Use the stored userId from another user
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({ firstName: 'John', lastName: 'Doe', emailAdress: 'j.doe@outlook.com', phonenumber: '06-87654321' }) // Trying to update another user's profile
-            .end((err, res) => {
-                expect(res).to.have.status(403);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('User is not the owner of this account');
-                done();
-            });
-    });
-
-    // TC-205-3: Phonenumber is not valid
-    it('TC-205-3: should return 400 if phonenumber is not valid', (done) => {
-        chai.request(app)
-            .put(`/api/user/${userId}`) // Use the stored userId from registration
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({ firstName: 'Maria', lastName: 'Johnes', emailAdress: 'm.johnes@test.com', phonenumber: '08-87654321' }) // invalid phonenumber
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('Validation error: Phonenumber must start with 06 and contain 10 digits.');
-                done();
-            });
-    });
-    
-    // TC-205-4: User not found
-    it ('TC-205-4: should return 404 if user does not exist', (done) => {
-        chai.request(app)
-            .put('/api/user/999949309') // invalid user ID
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({ firstName: 'Maria', lastName: 'Johnes', emailAdress: 'm.johnes@test.com'})
-            .end((err, res) => {
-                expect(res).to.have.status(404);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('User not found');
-                done();
-            });
-    });
-
-    // TC-205-5: User not authenticated
-    it('TC-205-5: should return 401 if user is not authenticated', (done) => {
-        chai.request(app)
-            .put(`/api/user/${userId}`) // Use the stored userId from registration
-            .send({ firstName: 'Maria', lastName: 'Johnes', emailAdress: 'm.johnes@test.com'})
-            .end((err, res) => {
-                expect(res).to.have.status(401);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('Access token is missing or invalid.');
-                done();
-            })
-    });
-
-    // TC-205-6: User successfully updated
-    it('TC-205-6: should return 200 and updated user data on successful update', (done) => {
-        chai.request(app)
-            .put(`/api/user/${userId}`) // Use the stored userId from registration
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .send({emailAdress: 'm.johnes@test.com', street: 'damstraat 1'})
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data');
-                expect(res.body).to.have.property('message').that.equal('User updated successfully');
-                expect(res.body.data).to.have.property('user');
-                expect(res.body.data.user).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'password', 'phonenumber');
-                expect(res.body.data.user.password).to.not.equal(userPassword); // Check if the password is hashed
-                expect(res.body.data.user.street).to.equal('damstraat 1'); // Check if the street is updated
                 done();
             });
     });
