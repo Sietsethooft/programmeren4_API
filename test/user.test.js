@@ -378,59 +378,6 @@ describe('UC-205 update user', () => {
     });
 });
 
-describe('UC-206 delete user', () => {
-    // TC-206-1: User not found
-    it('TC-206-1: should return 404 if user does not exist', (done) => {
-        chai.request(app)
-            .delete('/api/user/999949309') // invalid user ID
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(404);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('User not found');
-                done();
-            });
-    });
-
-    // TC-206-2: User not authenticated
-    it('TC-206-2: should return 401 if user is not authenticated', (done) => {
-        chai.request(app)
-            .delete(`/api/user/${userId}`) // Use the stored userId from registration
-            .end((err, res) => {
-                expect(res).to.have.status(401);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('Access token is missing or invalid.');
-                done();
-            });
-    });
-
-    // TC-206-3: User is not the owner
-    it('TC-206-3: should return 403 if user is not the owner', (done) => {
-        chai.request(app)
-            .delete(`/api/user/${userIdOtherPerson}`) // Use the stored userId from another user
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(403);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal('User is not the owner of this account');
-                done();
-            });
-    });
-
-    //TC-206-4: User successfully deleted
-    it('TC-206-4: should return 200 and confirmation message on successful deletion', (done) => {
-        chai.request(app)
-            .delete(`/api/user/${userId}`) // Use the stored userId from registration
-            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                expect(res.body).to.have.property('data').that.deep.equals({});
-                expect(res.body).to.have.property('message').that.equal(`User with ID ${userId} is deleted`);
-                done();
-            });
-    });
-});
-
 describe('UC-202 get all users', () => {
     // TC-202-1: get all users (minimal 2 users)
     it('TC-202-1: should return 200 and all users', (done) => {
@@ -516,6 +463,59 @@ describe('UC-202 get all users', () => {
                 });
                 expect(res.body.data.users.length).to.be.at.least(2); // Check if there are at least 2 users
                 expect(res.body.data.users[0]).to.include.keys('id', 'firstName', 'lastName', 'street', 'city', 'isActive', 'emailAdress', 'phonenumber');
+                done();
+            });
+    });
+});
+
+describe('UC-206 delete user', () => {
+    // TC-206-1: User not found
+    it('TC-206-1: should return 404 if user does not exist', (done) => {
+        chai.request(app)
+            .delete('/api/user/999949309') // invalid user ID
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User not found');
+                done();
+            });
+    });
+
+    // TC-206-2: User not authenticated
+    it('TC-206-2: should return 401 if user is not authenticated', (done) => {
+        chai.request(app)
+            .delete(`/api/user/${userId}`) // Use the stored userId from registration
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('Access token is missing or invalid.');
+                done();
+            });
+    });
+
+    // TC-206-3: User is not the owner
+    it('TC-206-3: should return 403 if user is not the owner', (done) => {
+        chai.request(app)
+            .delete(`/api/user/${userIdOtherPerson}`) // Use the stored userId from another user
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(403);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal('User is not the owner of this account');
+                done();
+            });
+    });
+
+    //TC-206-4: User successfully deleted
+    it('TC-206-4: should return 200 and confirmation message on successful deletion', (done) => {
+        chai.request(app)
+            .delete(`/api/user/${userId}`) // Use the stored userId from registration
+            .set('Authorization', `Bearer ${token}`) // Use the token for authentication
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body).to.have.property('data').that.deep.equals({});
+                expect(res.body).to.have.property('message').that.equal(`User with ID ${userId} is deleted`);
                 done();
             });
     });
