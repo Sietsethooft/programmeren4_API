@@ -80,7 +80,7 @@ Je kunt deze API testen met Postman of een andere REST client. Alle beveiligde r
 
 ### Voorbeeld login:
 
-```json
+```bash
 POST /api/login
 {
   "emailAddress": "j.smith@student.avans.nl",
@@ -144,7 +144,7 @@ GET    /api/meal/:mealId/participants                # Lijst van deelnemers
 GET    /api/meal/:mealId/participants/:participantId # Detail van een deelnemer
 ```
 
-# Overig:
+### Overig:
 
 ```bash
 POST   /api/login                     # Inloggen
